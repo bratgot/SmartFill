@@ -1,0 +1,2 @@
+C:\Users\marty\.nuke/nuke-ai-fill/menu.py
+C:\Users\marty\.nuke/nuke-ai-fill/AISmartFill.dll
