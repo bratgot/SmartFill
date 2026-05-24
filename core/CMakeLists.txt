@@ -23,6 +23,15 @@ if(ORT_FOUND)
     )
 endif()
 
+# Stable-Diffusion-dependent sources only compile when stable-diffusion.cpp
+# was located at configure time. Same pattern as LaMa: the header is
+# always present, the .cpp only compiles when the backend is available.
+if(SDCPP_FOUND)
+    list(APPEND _core_sources
+        src/sd_session.cpp
+    )
+endif()
+
 add_library(nuke_ai_fill_core STATIC ${_core_sources})
 
 target_include_directories(nuke_ai_fill_core
@@ -40,6 +49,17 @@ if(ORT_FOUND)
     # PUBLIC so it propagates to anything linking core - the Op will
     # use this to gate its inference code path.
     target_compile_definitions(nuke_ai_fill_core PUBLIC NUKE_AI_FILL_HAS_LAMA=1)
+endif()
+
+if(SDCPP_FOUND)
+    # PRIVATE link: sd.cpp + ggml + ggml-cuda is huge (~50MB static). We
+    # want only AIGenerate to actually pull those symbols in, not
+    # AISmartFill. The Op declares its own link to StableDiffusionCpp::lib;
+    # we only need the include path here so sd_session.cpp can compile.
+    target_link_libraries(nuke_ai_fill_core PRIVATE StableDiffusionCpp::lib)
+
+    # PUBLIC define so callers can gate generation code at compile time.
+    target_compile_definitions(nuke_ai_fill_core PUBLIC NUKE_AI_FILL_HAS_SD=1)
 endif()
 
 # This library does NOT link Nuke::NDK. It is pure C++17 with no

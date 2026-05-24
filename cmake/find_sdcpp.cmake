@@ -48,8 +48,11 @@ endif()
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 set(SD_BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 
-# sd.cpp executable targets are not needed - we only want the library.
-set(SD_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+# sd.cpp executable targets - we enable these specifically to get
+# sd-cli.exe for direct testing of the sd.cpp pipeline (bypassing our
+# SdSession wrapper). Useful for isolating bugs between our integration
+# and the underlying library.
+set(SD_BUILD_EXAMPLES ON  CACHE BOOL "" FORCE)
 set(SD_BUILD_TESTS    OFF CACHE BOOL "" FORCE)
 
 # CUDA backend. ggml will detect CUDA Toolkit and enable cublas/cudart.
