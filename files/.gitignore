@@ -1,0 +1,87 @@
+# Build outputs
+/build/
+/build-*/
+/out/
+/install/
+
+# CMake cache
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+*.cmake.in
+CMakeUserPresets.json
+
+# Visual Studio
+.vs/
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.sln
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.opensdf
+*.sdf
+*.VC.db
+*.VC.opendb
+*.tmp_proj
+
+# Compiled output
+*.exe
+*.dll
+*.so
+*.dylib
+*.lib
+*.a
+*.exp
+*.pdb
+*.idb
+*.obj
+*.ilk
+*.ipdb
+*.iobj
+*.map
+
+# Deploy staging dir (transient, source of truth is repo root)
+/files/
+
+# Local Nuke artifacts
+*.nk
+*.autosave
+.nuke/
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Python bytecode (menu.py generates none, but defensive)
+__pycache__/
+*.pyc
+
+# Local dev / scratch
+/scratch/
+/tmp/
+*.local.*
+
+# Third-party drops (will be git submodules or downloaded by CMake)
+/third_party/onnxruntime/
+/third_party/stable-diffusion.cpp/
+
+# Model files - downloaded at install time, never in repo
+*.onnx
+*.safetensors
+*.gguf
+*.ckpt
+*.pt
+*.bin
+models/
+
+# Cache (content-addressed EXR results from inference)
+/cache/
+*.exr.cache/
