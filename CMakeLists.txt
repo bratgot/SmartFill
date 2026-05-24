@@ -40,7 +40,7 @@ endif()
 # ----------------------------------------------------------------------
 
 option(BUILD_SMARTFILL    "Build AISmartFill Op (LaMa via ONNX Runtime)" ON)
-option(BUILD_GENERATE     "Build AIGenerate Op (stable-diffusion.cpp)"   ON)
+option(BUILD_GENERATE     "Build AIGenerate Op (stable-diffusion.cpp)"   OFF)
 option(SD_CUDA            "stable-diffusion.cpp: CUDA backend"           ON)
 option(SD_VULKAN          "stable-diffusion.cpp: Vulkan backend"         OFF)
 option(SD_AVX2            "stable-diffusion.cpp: CPU AVX2 baseline"      ON)
@@ -68,6 +68,15 @@ endif()
 # ----------------------------------------------------------------------
 
 include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/find_onnxruntime.cmake")
+
+# ----------------------------------------------------------------------
+# Find stable-diffusion.cpp source tree (optional - if not present,
+# AIGenerate is not built).
+# ----------------------------------------------------------------------
+
+if(BUILD_GENERATE)
+    include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/find_sdcpp.cmake")
+endif()
 
 # ----------------------------------------------------------------------
 # Global compile definitions and flags
@@ -119,7 +128,7 @@ if(BUILD_SMARTFILL)
     add_subdirectory(ops/AISmartFill)
 endif()
 
-if(BUILD_GENERATE)
+if(BUILD_GENERATE AND SDCPP_FOUND)
     add_subdirectory(ops/AIGenerate)
 endif()
 
@@ -199,8 +208,13 @@ if(BUILD_SMARTFILL)
     endif()
 endif()
 if(BUILD_GENERATE)
-    message(STATUS "  SD_CUDA      : ${SD_CUDA}")
-    message(STATUS "  SD_VULKAN    : ${SD_VULKAN}")
-    message(STATUS "  SD_CPP_DIR   : ${SD_CPP_DIR}")
+    message(STATUS "  SDCPP_DIR    : ${SDCPP_DIR}")
+    message(STATUS "  SDCPP_FOUND  : ${SDCPP_FOUND}")
+    if(SDCPP_FOUND)
+        message(STATUS "  SD_CUDA      : ${SD_CUDA}")
+        message(STATUS "  GGML_CUDA    : ${GGML_CUDA}")
+    else()
+        message(STATUS "  AIGenerate is requested but sd.cpp not found; skipping")
+    endif()
 endif()
 message(STATUS "")

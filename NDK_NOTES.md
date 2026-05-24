@@ -636,5 +636,432 @@ Then re-configure from scratch.
 
 ---
 
-*Updated through the nuke-ai-fill bring-up (May 2026). Add an entry
-here when a new gotcha costs a debugging round.*
+## 12. Windows ships its own onnxruntime.dll in System32
+
+This is a Windows 11 build-onward thing. The OS includes ONNX Runtime
+at `C:\Windows\System32\onnxruntime.dll` as part of the Windows AI
+Machine Learning infrastructure (HKLM\Software\Microsoft\Windows\
+CurrentVersion\AppModel\Runtime, and the WinSxS
+`amd64_microsoft-windows-ai-machinelearning_*` assemblies).
+
+### 12.1 Why it bites
+
+Windows' DLL search order for a plugin DLL loading dependencies:
+
+1. Already-loaded modules with same base name
+2. Application directory (Nuke's directory)
+3. **System32** -- wins here
+4. PATH
+5. Directory of the loading DLL (our plugin folder)
+
+Our plugin's bundled `onnxruntime.dll` (modern ORT, API 20+) sits at
+step 5, never reached. System32's older copy (API 17) loads instead.
+Symptom: `"The requested API version [20] is not available, only API
+versions [1, 17] are supported in this build. Current ORT Version is:
+1.17.1"` thrown from `Ort::Global<T>::api_` static initialization.
+
+### 12.2 The fix: lib-priority static init + DELAYLOAD
+
+Two combined tricks force our copy to win:
+
+**A) `/DELAYLOAD:onnxruntime.dll`** at link time. Defers implicit
+import resolution from "DLL load time" to "first call to an imported
+symbol". Without this, System32's ORT is bound at load before our
+DllMain runs.
+
+```cmake
+target_link_options(MyPlugin PRIVATE "/DELAYLOAD:onnxruntime.dll")
+target_link_libraries(MyPlugin PRIVATE delayimp.lib)
+```
+
+**B) `#pragma init_seg(lib)`** plus a global static helper that calls
+`LoadLibraryExW` on the adjacent `onnxruntime.dll` with
+`LOAD_WITH_ALTERED_SEARCH_PATH`. This runs at lib-priority static
+init, which fires BEFORE the user-priority static init where
+ORT's `Global<T>::api_` is constructed. By the time `OrtGetApiBase()`
+is called, our DLL is already in the loaded-module table.
+
+```cpp
+#pragma init_seg(lib)
+
+namespace {
+struct EarlyPreloader {
+    EarlyPreloader() { preload_adjacent_onnxruntime(); }
+};
+static EarlyPreloader g_early_preloader;
+}
+```
+
+### 12.3 No CRT in the early preloader
+
+`init_seg(lib)` runs very early. The CRT is not fully initialized.
+`fopen`, `printf`, `_wfopen_s`, even `std::string` constructors that
+allocate -- all can crash. Use Win32 only: `CreateFileW`, `WriteFile`,
+`GetModuleHandleExW`, `GetModuleFileNameW`, `LoadLibraryExW`,
+`WideCharToMultiByte`. Format numbers and strings by hand into stack
+buffers.
+
+### 12.4 Diagnostic log to %TEMP%
+
+When the preload silently fails, you have nothing. Write a log via
+`CreateFileW` + `WriteFile` to `%TEMP%\<plugin>-bootstrap.log` at the
+top of every static init step. After a failed plugin load, read the
+log to see exactly where it died. Common `GetLastError()` values:
+- 126 (ERROR_MOD_NOT_FOUND): missing dependent DLL
+- 193 (ERROR_BAD_EXE_FORMAT): 32/64-bit mismatch
+- 1114 (ERROR_DLL_INIT_FAILED): the DLL's DllMain returned FALSE
+
+### 12.5 Verifying the right DLL got loaded
+
+After triggering an ORT call in Nuke (e.g. by pressing a Bake button),
+PowerShell can confirm which onnxruntime.dll is actually loaded:
+
+```powershell
+$nuke = Get-Process | Where-Object { $_.ProcessName -match 'Nuke' } |
+        Sort-Object StartTime -Descending | Select-Object -First 1
+$nuke.Modules | Where-Object { $_.ModuleName -like 'onnx*' } |
+    Select-Object ModuleName, FileName, FileVersion |
+    Format-Table -AutoSize
+```
+
+Wrong: `C:\Windows\System32\onnxruntime.dll`
+Right: `<plugin install dir>\onnxruntime.dll`
+
+This same trick generalizes to any DLL Windows tries to satisfy from
+System32 (CUDA, OpenCL, anything else AI-related).
+
+---
+
+## 13. DDImage knob storage types are not std::string
+
+`File_knob`, `String_knob`, and similar string-backed knobs take
+`const char**`, not `std::string*`. Compile error:
+
+```
+error C2664: cannot convert argument 2 from 'std::string *' to 'const char **'
+```
+
+The correct pattern is `const char*` member variables with empty-string
+or nullptr initial values:
+
+```cpp
+class MyOp : public Iop {
+    const char* model_path_;
+    const char* status_text_;
+public:
+    MyOp(Node* n)
+        : Iop(n)
+        , model_path_("")
+        , status_text_("(idle)")
+    {}
+
+    void knobs(Knob_Callback f) override {
+        File_knob(f, &model_path_, "model_path", "Model");
+        String_knob(f, &status_text_, "status", "Status");
+    }
+};
+```
+
+### 13.1 Programmatic mutation: Knob::set_text, never direct assignment
+
+Writing directly to the backing pointer (`status_text_ = "new value"`)
+updates memory but does NOT cause the panel display to refresh. The
+correct path is via the knob object:
+
+```cpp
+void set_status(const char* s) {
+    if (Knob* k = knob("status")) {
+        k->set_text(s ? s : "");
+    }
+}
+```
+
+Per NDK_NOTES 5.1, `Knob::set_text` is main-thread only. Call from
+`knob_changed`, `_validate`, or other UI-thread contexts. Never from
+a worker thread.
+
+### 13.2 Numeric knobs: same rule, Knob::set_value
+
+Same pattern for `Float_knob`, `Int_knob` etc -- direct writes to the
+backing variable update memory but do not refresh the panel. Use
+`Knob::set_value(double)`:
+
+```cpp
+void set_progress(float v) {
+    progress_ = v;  // keep our copy in sync
+    if (Knob* k = knob("progress")) {
+        k->set_value(static_cast<double>(v));
+    }
+}
+```
+
+### 13.3 Reading knob values from C++
+
+The backing `const char*` member IS updated by Nuke when the user types
+into the panel. Reading is just `const char* current = model_path_;`.
+Null-defensive wrapper for use with std::string APIs:
+
+```cpp
+std::string ck_str(const char* s) {
+    return s ? std::string(s) : std::string{};
+}
+```
+
+---
+
+## 14. Output cache invalidation requires more than invalidate()
+
+When an Op's `engine()` output depends on internal state that the
+input-chain hash doesn't capture (e.g. a disk cache that becomes
+readable after a background bake), three things must all be done for
+Nuke to recook and the viewer to refresh:
+
+### 14.1 Override append(Hash&) to include internal state
+
+Nuke's default `Op::append` only hashes the input chain. If your
+output depends on something else (loaded cache buffer, model path,
+internal version counter), include it in `append`:
+
+```cpp
+void append(Hash& hash) override {
+    Iop::append(hash);
+    hash.append(loaded_key_);  // changes when cache loads
+}
+```
+
+Without this, the hash stays identical before and after the bake
+completes, and Nuke serves the cooked-from-stale-state pixels even
+after `invalidate()`.
+
+### 14.2 Call invalidate() AND asapUpdate() at the transition
+
+`invalidate()` marks the op cache stale. `asapUpdate()` triggers the
+UI redraw that actually requests the recook. One without the other
+is insufficient in practice:
+
+```cpp
+if (cache_just_became_available()) {
+    invalidate();
+    asapUpdate();
+}
+```
+
+Both are main-thread only.
+
+### 14.3 The viewer-refresh problem may still persist
+
+Even with append override + invalidate + asapUpdate, the viewer may
+not auto-refresh after a long-running background bake completes. The
+phenomenon: data is on disk, hash changes, but the viewer keeps
+showing the pre-bake cooked pixels until the user manually nudges
+something (disconnect/reconnect an input, change a knob).
+
+This is the same class of problem Foundry's `Inference` node solves
+internally with hooks the public NDK doesn't expose. Workarounds
+from Python via menu.py polling:
+
+```python
+def _nudge_viewer():
+    try:
+        v = nuke.activeViewer()
+        if v is None: return
+        # Touching a Viewer knob value forces it to recook downstream.
+        # 'hide_input' is a safe no-op knob to flip.
+        k = v.node().knob('hide_input')
+        if k is not None:
+            k.setValue(k.value())
+    except Exception:
+        pass
+```
+
+This works imperfectly. The honest assessment: full auto-refresh of
+the Viewer from a custom op after a background bake remains an open
+problem.
+
+---
+
+## 15. Python knob_changed callbacks miss C++ knob mutations
+
+`nuke.addKnobChanged(callback, nodeClass='MyOp')` fires for user-driven
+knob changes (typing, button presses, slider drags). It does NOT
+reliably fire when C++ code mutates a knob during the same handler --
+Nuke has re-entry guards.
+
+### 15.1 Don't trigger Python polling from knob events
+
+If you want Python code to react to a Bake button press, do not write:
+
+```python
+def callback():
+    knob = nuke.thisKnob()
+    if knob.name() == 'bake':  # may never fire
+        start_polling()
+```
+
+If your C++ `knob_changed` mutates other knobs during the bake-press
+handler (like updating a status display), Python's `nuke.thisKnob()`
+reports the last-mutated knob ('status'), not the user's actual press
+('bake').
+
+### 15.2 Continuous polling is bulletproof
+
+Run a main-thread timer unconditionally; check node state in the
+poll function:
+
+```python
+import threading
+import nuke
+
+_POLL_INTERVAL_S = 0.3
+_active_markers = ("Cooking", "Writing", "Loading")
+
+def _poll_step():
+    try:
+        for n in nuke.allNodes():
+            if n.Class() != "MyOp": continue
+            sk = n.knob("status")
+            if sk is None: continue
+            if any(m in sk.value() for m in _active_markers):
+                n.forceValidate()
+    except Exception:
+        pass
+    # Always reschedule -- cheap and reliable
+    t = threading.Timer(_POLL_INTERVAL_S,
+                       lambda: nuke.executeInMainThread(_poll_step))
+    t.daemon = True
+    t.start()
+
+nuke.executeInMainThread(_poll_step)
+```
+
+Cost: ~3 node iterations per second when nothing is happening.
+Negligible. The "always reschedule, no trigger detection" pattern is
+the only one that's reliably worked across Nuke versions and across
+the re-entry edge cases.
+
+---
+
+## 16. ONNX model preprocessing must match the export's convention
+
+Different ONNX exports of the same model architecture can use radically
+different preprocessing. Document conventions from the model's README
+or HF discussions; do not assume.
+
+### 16.1 LaMa-ONNX (Carve) specific
+
+From huggingface.co/Carve/LaMa-ONNX discussions:
+
+- **Input image**: float32 in **[0, 1]**, layout NCHW (1,3,512,512)
+- **Input mask**: float32 binary 0/1, layout NCHW (1,1,512,512), 1 = inpaint
+- **NO pre-masking** of input image -- the network handles internally
+- **Output**: float32 in **[0, 255]** -- divide by 255 to get [0, 1]
+
+The original PyTorch model output is [0,1]; the ONNX export multiplies
+by 255 internally. Missing the /255 produces values up to ~230 in the
+inpainted region, which Nuke's viewer clips to white.
+
+### 16.2 Reading the model spec from Python
+
+When in doubt, introspect:
+
+```python
+import onnxruntime as ort
+sess = ort.InferenceSession(r"path/to/model.onnx")
+for inp in sess.get_inputs():
+    print(f"Input  {inp.name:20} shape={inp.shape} type={inp.type}")
+for out in sess.get_outputs():
+    print(f"Output {out.name:20} shape={out.shape} type={out.type}")
+meta = sess.get_modelmeta()
+print(f"Custom metadata: {dict(meta.custom_metadata_map)}")
+```
+
+Custom metadata is empty for most community exports; you'll have to
+read the model's docs or test empirically.
+
+### 16.3 Diagnosing range mismatches via cache inspection
+
+If output looks wrong (white blobs, weird colors), inspect the actual
+written values, not what the model "should" output:
+
+```python
+import struct, numpy as np
+with open(cache_path, 'rb') as f:
+    f.read(8)  # magic
+    version, w, h, c, _ = struct.unpack('<IIIII', f.read(20))
+    data = np.frombuffer(f.read(), dtype=np.float32).reshape(h, w, c)
+print(f"min={data.min()} max={data.max()} mean={data.mean()}")
+```
+
+`max > 2` strongly suggests an output-scale mismatch (model emits
+[0,255], code treats as [0,1]).
+
+---
+
+## 17. Content-addressed disk caches and async bakes
+
+The combined pattern -- background worker, Bake button, content-keyed
+disk cache, lazy in-memory load -- works well for slow ML inference.
+Several details matter.
+
+### 17.1 Cache key must be deterministic
+
+The key is SHA-256 of (input op hashes + all knobs that affect output
++ model file path). Cache hits short-circuit the whole bake; cache
+misses spawn the worker. Misses on identical inputs mean the key
+function is non-deterministic somewhere.
+
+```cpp
+nf::CacheKeyBuilder kb;
+kb.add(std::string("MyOp.v1"));
+if (input(0)) {
+    Hash h;
+    input(0)->append(h);
+    kb.add_op_hash(static_cast<uint64_t>(h.value()));
+}
+kb.add(threshold_);  // every knob that affects output
+kb.add(static_cast<int32_t>(backend_));
+kb.add(normalize_path(ck_str(model_path_)));
+return kb.finalize();
+```
+
+### 17.2 Atomic write via .tmp + rename
+
+Writing the cache file directly is unsafe: a crash mid-write leaves
+a corrupted file that a concurrent reader will load as garbage.
+Standard fix:
+
+```cpp
+const std::string tmp_path = path + ".tmp";
+// write to tmp_path
+std::filesystem::remove(path);  // Windows: rename won't overwrite
+std::filesystem::rename(tmp_path, path);
+```
+
+### 17.3 Cache invalidation on code changes
+
+Cache files persist across plugin rebuilds. If a buggy version of
+the plugin wrote bad data, subsequent fixed-version bakes hit the
+"already cached" short-circuit and serve the bad data. ALWAYS clear
+the cache when changing code that affects output:
+
+```powershell
+Remove-Item "$env:APPDATA\<plugin>\cache\*.aifill" -Force
+```
+
+Include a Clear Cache button in the Op's panel for users.
+
+### 17.4 Worker thread can't touch knobs
+
+Per NDK_NOTES 5.1, only main thread touches knobs. The worker
+writes progress and status to an atomic state structure
+(`AiWorkerContext`); the main-thread polling (via menu.py timer
+firing `forceValidate`) reads that state during `_validate` and
+updates the knobs.
+
+---
+
+*Updated through the nuke-ai-fill LaMa wiring (May 2026), including
+the Windows-System32-ONNX battle, DDImage knob-storage discovery,
+viewer-refresh investigation, and Carve LaMa-ONNX normalization
+convention. Add an entry here when a new gotcha costs a debugging
+round.*

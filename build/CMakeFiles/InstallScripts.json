@@ -1,9 +1,0 @@
-{
-	"InstallScripts" : 
-	[
-		"C:/dev/SmartFill/build/cmake_install.cmake",
-		"C:/dev/SmartFill/build/core/cmake_install.cmake",
-		"C:/dev/SmartFill/build/ops/AISmartFill/cmake_install.cmake"
-	],
-	"Parallel" : false
-}

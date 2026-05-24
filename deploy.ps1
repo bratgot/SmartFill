@@ -36,6 +36,7 @@ $Manifest = @(
     @{ Source = 'menu.py';                  Target = 'menu.py';                          Ascii = $false },
     @{ Source = 'install_user_menu.cmake';  Target = 'cmake\install_user_menu.cmake';    Ascii = $true  },
     @{ Source = 'find_onnxruntime.cmake';   Target = 'cmake\find_onnxruntime.cmake';     Ascii = $true  },
+    @{ Source = 'find_sdcpp.cmake';         Target = 'cmake\find_sdcpp.cmake';           Ascii = $true  },
     @{ Source = 'ai_hash.h';                Target = 'core\include\ai_hash.h';           Ascii = $true  },
     @{ Source = 'ai_cache.h';               Target = 'core\include\ai_cache.h';          Ascii = $true  },
     @{ Source = 'ai_worker.h';              Target = 'core\include\ai_worker.h';         Ascii = $true  },
@@ -51,7 +52,9 @@ $Manifest = @(
     @{ Source = 'image_cache.cpp';          Target = 'core\src\image_cache.cpp';         Ascii = $true  },
     @{ Source = 'plugin_path.cpp';          Target = 'core\src\plugin_path.cpp';         Ascii = $true  },
     @{ Source = 'AISmartFill.cpp';          Target = 'ops\AISmartFill\AISmartFill.cpp';  Ascii = $true  },
-    @{ Source = 'dll_bootstrap.cpp';        Target = 'ops\AISmartFill\dll_bootstrap.cpp'; Ascii = $true }
+    @{ Source = 'dll_bootstrap.cpp';        Target = 'ops\AISmartFill\dll_bootstrap.cpp'; Ascii = $true },
+    @{ Source = 'AIGenerate.cpp';           Target = 'ops\AIGenerate\AIGenerate.cpp';    Ascii = $true  },
+    @{ Source = 'AIGenerate_CMakeLists.txt'; Target = 'ops\AIGenerate\CMakeLists.txt';   Ascii = $true  }
 )
 
 $CMakeManifest = @(
