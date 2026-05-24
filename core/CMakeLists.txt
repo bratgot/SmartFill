@@ -4,11 +4,26 @@
 # plugin DLL, not loaded separately. Built with the same /MD release
 # CRT and the same defines as the plugins (via nuke_ai_fill_flags).
 
-add_library(nuke_ai_fill_core STATIC
+set(_core_sources
     src/ai_hash.cpp
     src/ai_worker.cpp
     src/ai_cache.cpp
+    src/image_cache.cpp
+    src/plugin_path.cpp
 )
+
+# LaMa-dependent sources only compile when ONNX Runtime was found at
+# configure time. The headers are always present (so includes resolve
+# cleanly), but calling any LamaSession/inpaint_image method without
+# NUKE_AI_FILL_HAS_LAMA defined is a link error - by design.
+if(ORT_FOUND)
+    list(APPEND _core_sources
+        src/lama_session.cpp
+        src/lama_tiler.cpp
+    )
+endif()
+
+add_library(nuke_ai_fill_core STATIC ${_core_sources})
 
 target_include_directories(nuke_ai_fill_core
     PUBLIC
@@ -19,6 +34,13 @@ target_link_libraries(nuke_ai_fill_core
     PUBLIC
         nuke_ai_fill_flags
 )
+
+if(ORT_FOUND)
+    target_link_libraries(nuke_ai_fill_core PUBLIC OnnxRuntime::OnnxRuntime)
+    # PUBLIC so it propagates to anything linking core - the Op will
+    # use this to gate its inference code path.
+    target_compile_definitions(nuke_ai_fill_core PUBLIC NUKE_AI_FILL_HAS_LAMA=1)
+endif()
 
 # This library does NOT link Nuke::NDK. It is pure C++17 with no
 # DD::Image dependency. The Op-side glue that bridges Nuke buffers

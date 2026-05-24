@@ -1,34 +1,123 @@
 # nuke-ai-fill / menu.py
 #
-# Registers the AISmartFill node in Nuke's menus and toolbar.
+# Registers AISmartFill and runs a continuous main-thread polling
+# loop that calls forceValidate() on any AISmartFill node reporting
+# active work. Why continuous (vs trigger-on-knob-change): C++
+# knob_changed mutates the status knob via set_text(), which does
+# NOT reliably fire the Python addKnobChanged callback (Nuke has
+# re-entry guards). Trying to detect Bake from Python is fragile.
+# Continuous polling is bulletproof and cheap.
 #
-# Installed location: <plugin_root>/menu.py, where the user's
-# .nuke/menu.py adds the plugin root via nuke.pluginAddPath().
+# Additional responsibility: when a node transitions out of cooking,
+# nudge any active viewer to recook so the user sees the inpainted
+# result without manually disconnecting/reconnecting an input.
+
+import threading
 
 import nuke
 
+# ----------------------------------------------------------------------
+# Node registration
+# ----------------------------------------------------------------------
 
 def _register_smartfill():
-    """Add AISmartFill to the Filter menu and the toolbar."""
-    # Filter menu entry.
     filter_menu = nuke.menu("Nodes").findItem("Filter")
     if filter_menu is None:
-        # Defensive: create the Filter menu if Nuke has not yet
-        # populated it (rare, but happens with stripped configs).
         filter_menu = nuke.menu("Nodes").addMenu("Filter")
-    filter_menu.addCommand(
-        "AISmartFill",
-        "nuke.createNode('AISmartFill')",
-        icon="AISmartFill.png",
-    )
-
-
-def _register_aigenerate():
-    """Stub - AIGenerate is not yet built; this hook lands later."""
-    # Intentionally a no-op for now. The future AIGenerate Op will
-    # register itself here.
-    pass
-
+    filter_menu.addCommand("AISmartFill", "nuke.createNode('AISmartFill')")
 
 _register_smartfill()
-_register_aigenerate()
+
+# ----------------------------------------------------------------------
+# Continuous polling loop
+# ----------------------------------------------------------------------
+
+_POLL_INTERVAL_S = 0.3
+_active_status_markers = ("Cooking", "Writing", "Loading",
+                          "Starting", "Preparing", "Inferencing")
+
+# Tracks per-node previous status to detect transitions.
+_prev_status = {}
+
+
+def _is_active(val):
+    return any(marker in val for marker in _active_status_markers)
+
+
+def _nudge_viewer():
+    """Force the active viewer to recook. Used after a node transitions
+    out of cooking state, to make the freshly-baked result visible
+    without the user having to manually disconnect/reconnect inputs."""
+    try:
+        v = nuke.activeViewer()
+        if v is None:
+            return
+        # Multiple mechanisms in order of strength:
+        # 1. Frame-nudge: re-set current frame to itself (cheap, sometimes works)
+        # 2. Refresh viewer node by toggling a UI knob
+        try:
+            cur = nuke.frame()
+            nuke.frame(cur)
+        except Exception:
+            pass
+        # 3. Nudge the viewer node directly
+        try:
+            vnode = v.node()
+            if vnode is not None:
+                # Touching a knob value forces the viewer to recook
+                # downstream. update_only knob is a common Viewer knob.
+                k = vnode.knob('hide_input')
+                if k is not None:
+                    cur = k.value()
+                    k.setValue(cur)  # no-op set still kicks a redraw
+        except Exception:
+            pass
+    except Exception:
+        pass
+
+
+def _poll_step():
+    """Main thread. Walk all AISmartFill nodes; forceValidate any
+    whose status reports active work. On transition out of active,
+    nudge the viewer to recook."""
+    try:
+        transitioned_to_ready = False
+        for n in nuke.allNodes():
+            try:
+                if n.Class() != "AISmartFill":
+                    continue
+                sk = n.knob("status")
+                if sk is None:
+                    continue
+                val = sk.value()
+                key = n.fullName()
+                was_active = _prev_status.get(key, "")
+                was_active_flag = _is_active(was_active)
+
+                if _is_active(val):
+                    n.forceValidate()
+                    # Re-read after validate; it may have transitioned.
+                    val = sk.value()
+
+                if was_active_flag and not _is_active(val):
+                    transitioned_to_ready = True
+
+                _prev_status[key] = val
+            except Exception:
+                pass
+
+        if transitioned_to_ready:
+            _nudge_viewer()
+
+    except Exception:
+        pass
+
+    timer = threading.Timer(
+        _POLL_INTERVAL_S,
+        lambda: nuke.executeInMainThread(_poll_step))
+    timer.daemon = True
+    timer.start()
+
+
+# Kick off the loop at module load.
+nuke.executeInMainThread(_poll_step)

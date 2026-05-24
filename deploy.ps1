@@ -35,13 +35,23 @@ $Manifest = @(
     @{ Source = '.gitignore';               Target = '.gitignore';                       Ascii = $false },
     @{ Source = 'menu.py';                  Target = 'menu.py';                          Ascii = $false },
     @{ Source = 'install_user_menu.cmake';  Target = 'cmake\install_user_menu.cmake';    Ascii = $true  },
+    @{ Source = 'find_onnxruntime.cmake';   Target = 'cmake\find_onnxruntime.cmake';     Ascii = $true  },
     @{ Source = 'ai_hash.h';                Target = 'core\include\ai_hash.h';           Ascii = $true  },
     @{ Source = 'ai_cache.h';               Target = 'core\include\ai_cache.h';          Ascii = $true  },
     @{ Source = 'ai_worker.h';              Target = 'core\include\ai_worker.h';         Ascii = $true  },
+    @{ Source = 'lama_session.h';           Target = 'core\include\lama_session.h';      Ascii = $true  },
+    @{ Source = 'lama_tiler.h';             Target = 'core\include\lama_tiler.h';        Ascii = $true  },
+    @{ Source = 'image_cache.h';            Target = 'core\include\image_cache.h';       Ascii = $true  },
+    @{ Source = 'plugin_path.h';            Target = 'core\include\plugin_path.h';       Ascii = $true  },
     @{ Source = 'ai_hash.cpp';              Target = 'core\src\ai_hash.cpp';             Ascii = $true  },
     @{ Source = 'ai_cache.cpp';             Target = 'core\src\ai_cache.cpp';            Ascii = $true  },
     @{ Source = 'ai_worker.cpp';            Target = 'core\src\ai_worker.cpp';           Ascii = $true  },
-    @{ Source = 'AISmartFill.cpp';          Target = 'ops\AISmartFill\AISmartFill.cpp';  Ascii = $true  }
+    @{ Source = 'lama_session.cpp';         Target = 'core\src\lama_session.cpp';        Ascii = $true  },
+    @{ Source = 'lama_tiler.cpp';           Target = 'core\src\lama_tiler.cpp';          Ascii = $true  },
+    @{ Source = 'image_cache.cpp';          Target = 'core\src\image_cache.cpp';         Ascii = $true  },
+    @{ Source = 'plugin_path.cpp';          Target = 'core\src\plugin_path.cpp';         Ascii = $true  },
+    @{ Source = 'AISmartFill.cpp';          Target = 'ops\AISmartFill\AISmartFill.cpp';  Ascii = $true  },
+    @{ Source = 'dll_bootstrap.cpp';        Target = 'ops\AISmartFill\dll_bootstrap.cpp'; Ascii = $true }
 )
 
 $CMakeManifest = @(

@@ -87,7 +87,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>C:\dev\SmartFill\core\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>%(AdditionalOptions) /external:I "C:/Program Files/Nuke14.1v8/include" /Zc:__cplusplus</AdditionalOptions>
+      <AdditionalOptions>%(AdditionalOptions) /external:I "C:/Program Files/Nuke14.1v8/include" /external:I "C:/dev/onnxruntime-win-x64-gpu-1.20.1/include" /Zc:__cplusplus</AdditionalOptions>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <BufferSecurityCheck></BufferSecurityCheck>
@@ -110,16 +110,17 @@
       <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
       <UseFullPaths>false</UseFullPaths>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NOMINMAX;_USE_MATH_DEFINES;WIN32_LEAN_AND_MEAN;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR="Debug";AISmartFill_EXPORTS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NUKE_AI_FILL_HAS_LAMA=1;NOMINMAX;_USE_MATH_DEFINES;WIN32_LEAN_AND_MEAN;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR="Debug";AISmartFill_EXPORTS</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
+      <AdditionalUsingDirectories>C:/dev/onnxruntime-win-x64-gpu-1.20.1/lib</AdditionalUsingDirectories>
       <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;NOMINMAX;_USE_MATH_DEFINES;WIN32_LEAN_AND_MEAN;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR=\"Debug\";AISmartFill_EXPORTS</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\dev\SmartFill\core\include;C:\Program Files\Nuke14.1v8\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;NUKE_AI_FILL_HAS_LAMA=1;NOMINMAX;_USE_MATH_DEFINES;WIN32_LEAN_AND_MEAN;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR=\"Debug\";AISmartFill_EXPORTS</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\dev\SmartFill\core\include;C:\Program Files\Nuke14.1v8\include;C:\dev\onnxruntime-win-x64-gpu-1.20.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\dev\SmartFill\core\include;C:\Program Files\Nuke14.1v8\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\dev\SmartFill\core\include;C:\Program Files\Nuke14.1v8\include;C:\dev\onnxruntime-win-x64-gpu-1.20.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -127,10 +128,11 @@
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <Link>
-      <AdditionalDependencies>..\..\core\Debug\nuke_ai_fill_core.lib;opengl32.lib;C:\Program Files\Nuke14.1v8\DDImage.lib;C:\Program Files\Nuke14.1v8\RIPFramework.lib;C:\Program Files\Nuke14.1v8\glew32.lib;C:\Program Files\Nuke14.1v8\tbb.lib;C:\Program Files\Nuke14.1v8\tbbmalloc.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>..\..\core\Debug\nuke_ai_fill_core.lib;delayimp.lib;opengl32.lib;C:\Program Files\Nuke14.1v8\DDImage.lib;C:\Program Files\Nuke14.1v8\RIPFramework.lib;C:\Program Files\Nuke14.1v8\glew32.lib;C:\Program Files\Nuke14.1v8\tbb.lib;C:\Program Files\Nuke14.1v8\tbbmalloc.lib;C:\dev\onnxruntime-win-x64-gpu-1.20.1\lib\onnxruntime.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <DataExecutionPrevention></DataExecutionPrevention>
+      <DelayLoadDLLs>onnxruntime.dll</DelayLoadDLLs>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <ImageHasSafeExceptionHandlers></ImageHasSafeExceptionHandlers>
@@ -147,7 +149,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>C:\dev\SmartFill\core\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>%(AdditionalOptions) /external:I "C:/Program Files/Nuke14.1v8/include" /Zc:__cplusplus</AdditionalOptions>
+      <AdditionalOptions>%(AdditionalOptions) /external:I "C:/Program Files/Nuke14.1v8/include" /external:I "C:/dev/onnxruntime-win-x64-gpu-1.20.1/include" /Zc:__cplusplus</AdditionalOptions>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <BufferSecurityCheck></BufferSecurityCheck>
@@ -169,18 +171,19 @@
       <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
       <UseFullPaths>false</UseFullPaths>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;NOMINMAX;_USE_MATH_DEFINES;WIN32_LEAN_AND_MEAN;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR="Release";AISmartFill_EXPORTS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;NUKE_AI_FILL_HAS_LAMA=1;NOMINMAX;_USE_MATH_DEFINES;WIN32_LEAN_AND_MEAN;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR="Release";AISmartFill_EXPORTS</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <DebugInformationFormat>
       </DebugInformationFormat>
+      <AdditionalUsingDirectories>C:/dev/onnxruntime-win-x64-gpu-1.20.1/lib</AdditionalUsingDirectories>
       <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;NOMINMAX;_USE_MATH_DEFINES;WIN32_LEAN_AND_MEAN;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR=\"Release\";AISmartFill_EXPORTS</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\dev\SmartFill\core\include;C:\Program Files\Nuke14.1v8\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;NUKE_AI_FILL_HAS_LAMA=1;NOMINMAX;_USE_MATH_DEFINES;WIN32_LEAN_AND_MEAN;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR=\"Release\";AISmartFill_EXPORTS</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\dev\SmartFill\core\include;C:\Program Files\Nuke14.1v8\include;C:\dev\onnxruntime-win-x64-gpu-1.20.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\dev\SmartFill\core\include;C:\Program Files\Nuke14.1v8\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\dev\SmartFill\core\include;C:\Program Files\Nuke14.1v8\include;C:\dev\onnxruntime-win-x64-gpu-1.20.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -188,10 +191,11 @@
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <Link>
-      <AdditionalDependencies>..\..\core\Release\nuke_ai_fill_core.lib;opengl32.lib;C:\Program Files\Nuke14.1v8\DDImage.lib;C:\Program Files\Nuke14.1v8\RIPFramework.lib;C:\Program Files\Nuke14.1v8\glew32.lib;C:\Program Files\Nuke14.1v8\tbb.lib;C:\Program Files\Nuke14.1v8\tbbmalloc.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>..\..\core\Release\nuke_ai_fill_core.lib;delayimp.lib;opengl32.lib;C:\Program Files\Nuke14.1v8\DDImage.lib;C:\Program Files\Nuke14.1v8\RIPFramework.lib;C:\Program Files\Nuke14.1v8\glew32.lib;C:\Program Files\Nuke14.1v8\tbb.lib;C:\Program Files\Nuke14.1v8\tbbmalloc.lib;C:\dev\onnxruntime-win-x64-gpu-1.20.1\lib\onnxruntime.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <DataExecutionPrevention></DataExecutionPrevention>
+      <DelayLoadDLLs>onnxruntime.dll</DelayLoadDLLs>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <ImageHasSafeExceptionHandlers></ImageHasSafeExceptionHandlers>
@@ -208,7 +212,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>C:\dev\SmartFill\core\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>%(AdditionalOptions) /external:I "C:/Program Files/Nuke14.1v8/include" /Zc:__cplusplus</AdditionalOptions>
+      <AdditionalOptions>%(AdditionalOptions) /external:I "C:/Program Files/Nuke14.1v8/include" /external:I "C:/dev/onnxruntime-win-x64-gpu-1.20.1/include" /Zc:__cplusplus</AdditionalOptions>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <BufferSecurityCheck></BufferSecurityCheck>
@@ -230,18 +234,19 @@
       <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
       <UseFullPaths>false</UseFullPaths>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;NOMINMAX;_USE_MATH_DEFINES;WIN32_LEAN_AND_MEAN;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR="MinSizeRel";AISmartFill_EXPORTS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;NUKE_AI_FILL_HAS_LAMA=1;NOMINMAX;_USE_MATH_DEFINES;WIN32_LEAN_AND_MEAN;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR="MinSizeRel";AISmartFill_EXPORTS</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <DebugInformationFormat>
       </DebugInformationFormat>
+      <AdditionalUsingDirectories>C:/dev/onnxruntime-win-x64-gpu-1.20.1/lib</AdditionalUsingDirectories>
       <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;NOMINMAX;_USE_MATH_DEFINES;WIN32_LEAN_AND_MEAN;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR=\"MinSizeRel\";AISmartFill_EXPORTS</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\dev\SmartFill\core\include;C:\Program Files\Nuke14.1v8\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;NUKE_AI_FILL_HAS_LAMA=1;NOMINMAX;_USE_MATH_DEFINES;WIN32_LEAN_AND_MEAN;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR=\"MinSizeRel\";AISmartFill_EXPORTS</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\dev\SmartFill\core\include;C:\Program Files\Nuke14.1v8\include;C:\dev\onnxruntime-win-x64-gpu-1.20.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\dev\SmartFill\core\include;C:\Program Files\Nuke14.1v8\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\dev\SmartFill\core\include;C:\Program Files\Nuke14.1v8\include;C:\dev\onnxruntime-win-x64-gpu-1.20.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -249,10 +254,11 @@
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <Link>
-      <AdditionalDependencies>..\..\core\MinSizeRel\nuke_ai_fill_core.lib;opengl32.lib;C:\Program Files\Nuke14.1v8\DDImage.lib;C:\Program Files\Nuke14.1v8\RIPFramework.lib;C:\Program Files\Nuke14.1v8\glew32.lib;C:\Program Files\Nuke14.1v8\tbb.lib;C:\Program Files\Nuke14.1v8\tbbmalloc.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>..\..\core\MinSizeRel\nuke_ai_fill_core.lib;delayimp.lib;opengl32.lib;C:\Program Files\Nuke14.1v8\DDImage.lib;C:\Program Files\Nuke14.1v8\RIPFramework.lib;C:\Program Files\Nuke14.1v8\glew32.lib;C:\Program Files\Nuke14.1v8\tbb.lib;C:\Program Files\Nuke14.1v8\tbbmalloc.lib;C:\dev\onnxruntime-win-x64-gpu-1.20.1\lib\onnxruntime.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <DataExecutionPrevention></DataExecutionPrevention>
+      <DelayLoadDLLs>onnxruntime.dll</DelayLoadDLLs>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <ImageHasSafeExceptionHandlers></ImageHasSafeExceptionHandlers>
@@ -269,7 +275,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>C:\dev\SmartFill\core\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>%(AdditionalOptions) /external:I "C:/Program Files/Nuke14.1v8/include" /Zc:__cplusplus</AdditionalOptions>
+      <AdditionalOptions>%(AdditionalOptions) /external:I "C:/Program Files/Nuke14.1v8/include" /external:I "C:/dev/onnxruntime-win-x64-gpu-1.20.1/include" /Zc:__cplusplus</AdditionalOptions>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <BufferSecurityCheck></BufferSecurityCheck>
@@ -292,16 +298,17 @@
       <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
       <UseFullPaths>false</UseFullPaths>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;NOMINMAX;_USE_MATH_DEFINES;WIN32_LEAN_AND_MEAN;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR="RelWithDebInfo";AISmartFill_EXPORTS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;NUKE_AI_FILL_HAS_LAMA=1;NOMINMAX;_USE_MATH_DEFINES;WIN32_LEAN_AND_MEAN;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR="RelWithDebInfo";AISmartFill_EXPORTS</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
+      <AdditionalUsingDirectories>C:/dev/onnxruntime-win-x64-gpu-1.20.1/lib</AdditionalUsingDirectories>
       <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;NOMINMAX;_USE_MATH_DEFINES;WIN32_LEAN_AND_MEAN;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR=\"RelWithDebInfo\";AISmartFill_EXPORTS</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\dev\SmartFill\core\include;C:\Program Files\Nuke14.1v8\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;NUKE_AI_FILL_HAS_LAMA=1;NOMINMAX;_USE_MATH_DEFINES;WIN32_LEAN_AND_MEAN;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR=\"RelWithDebInfo\";AISmartFill_EXPORTS</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\dev\SmartFill\core\include;C:\Program Files\Nuke14.1v8\include;C:\dev\onnxruntime-win-x64-gpu-1.20.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\dev\SmartFill\core\include;C:\Program Files\Nuke14.1v8\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\dev\SmartFill\core\include;C:\Program Files\Nuke14.1v8\include;C:\dev\onnxruntime-win-x64-gpu-1.20.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -309,10 +316,11 @@
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <Link>
-      <AdditionalDependencies>..\..\core\RelWithDebInfo\nuke_ai_fill_core.lib;opengl32.lib;C:\Program Files\Nuke14.1v8\DDImage.lib;C:\Program Files\Nuke14.1v8\RIPFramework.lib;C:\Program Files\Nuke14.1v8\glew32.lib;C:\Program Files\Nuke14.1v8\tbb.lib;C:\Program Files\Nuke14.1v8\tbbmalloc.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>..\..\core\RelWithDebInfo\nuke_ai_fill_core.lib;delayimp.lib;opengl32.lib;C:\Program Files\Nuke14.1v8\DDImage.lib;C:\Program Files\Nuke14.1v8\RIPFramework.lib;C:\Program Files\Nuke14.1v8\glew32.lib;C:\Program Files\Nuke14.1v8\tbb.lib;C:\Program Files\Nuke14.1v8\tbbmalloc.lib;C:\dev\onnxruntime-win-x64-gpu-1.20.1\lib\onnxruntime.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <DataExecutionPrevention></DataExecutionPrevention>
+      <DelayLoadDLLs>onnxruntime.dll</DelayLoadDLLs>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <ImageHasSafeExceptionHandlers></ImageHasSafeExceptionHandlers>
@@ -385,6 +393,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="C:\dev\SmartFill\ops\AISmartFill\AISmartFill.cpp" />
+    <ClCompile Include="C:\dev\SmartFill\ops\AISmartFill\dll_bootstrap.cpp" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

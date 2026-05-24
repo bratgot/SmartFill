@@ -47,7 +47,32 @@ if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/nuke-ai-fill" TYPE FILE FILES "C:/dev/SmartFill/LICENSE")
+endif()
+
+if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/nuke-ai-fill" TYPE FILE FILES "C:/dev/SmartFill/THIRD_PARTY_LICENSES.md")
+endif()
+
+if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/nuke-ai-fill" TYPE FILE FILES "C:/dev/SmartFill/README.md")
+endif()
+
+if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/nuke-ai-fill" TYPE DIRECTORY FILES "C:/dev/SmartFill/build/plugin/" FILES_MATCHING REGEX "/[^/]*\\.dll$")
+endif()
+
+if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/nuke-ai-fill" TYPE FILE FILES
+    "C:/dev/onnxruntime-win-x64-gpu-1.20.1/lib/onnxruntime.dll"
+    "C:/dev/onnxruntime-win-x64-gpu-1.20.1/lib/onnxruntime_providers_cuda.dll"
+    "C:/dev/onnxruntime-win-x64-gpu-1.20.1/lib/onnxruntime_providers_shared.dll"
+    "C:/dev/onnxruntime-win-x64-gpu-1.20.1/lib/onnxruntime_providers_tensorrt.dll"
+    )
+endif()
+
+if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/nuke-ai-fill/models" TYPE FILE FILES "C:/dev/SmartFill/models/lama_fp32.onnx")
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)

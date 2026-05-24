@@ -1048,3 +1048,65 @@ events:
       Microsoft (R) Incremental Linker Version 14.29.30159.0
       Copyright (C) Microsoft Corporation.  All rights reserved.
 ...
+
+---
+events:
+  -
+    kind: "find-v1"
+    backtrace:
+      - "cmake/find_onnxruntime.cmake:50 (find_path)"
+      - "CMakeLists.txt:70 (include)"
+    mode: "path"
+    variable: "_ort_include_dir"
+    description: "Path to a file."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "onnxruntime_cxx_api.h"
+    candidate_directories:
+      - "C:/dev/onnxruntime-win-x64-gpu-1.20.1/include/"
+    found: "C:/dev/onnxruntime-win-x64-gpu-1.20.1/include/"
+    search_context:
+      ENV{PATH}:
+        - "C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v11.8\\bin"
+        - "C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v11.8\\libnvvp"
+        - "C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.6\\bin"
+        - "C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.6\\libnvvp"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\Docker\\Docker\\resources\\bin"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Strawberry\\c\\bin"
+        - "C:\\Strawberry\\perl\\site\\bin"
+        - "C:\\Strawberry\\perl\\bin"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\NVIDIA Corporation\\Nsight Compute 2022.3.0\\"
+        - "C:\\Users\\marty\\.cargo\\bin"
+        - "C:\\Users\\marty\\AppData\\Local\\Programs\\Python\\Python311\\Scripts\\"
+        - "C:\\Users\\marty\\AppData\\Local\\Programs\\Python\\Python311\\"
+        - "C:\\Users\\marty\\AppData\\Local\\Programs\\Python\\Python314\\Scripts\\"
+        - "C:\\Users\\marty\\AppData\\Local\\Programs\\Python\\Python314\\"
+        - "C:\\Users\\marty\\AppData\\Local\\Programs\\Python\\Launcher\\"
+        - "C:\\Users\\marty\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\marty\\AppData\\Local\\Python\\bin"
+        - "C:\\Users\\marty\\AppData\\Local\\Microsoft\\WinGet\\Packages\\lucasg.Dependencies_Microsoft.Winget.Source_8wekyb3d8bbwe"
+        - "C:\\vcpkg"
+      CMAKE_INSTALL_PREFIX: "C:/Program Files/nuke_ai_fill"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "C:/Program Files"
+        - "C:/Program Files (x86)"
+        - "C:/Program Files/CMake"
+        - "C:/Program Files/nuke_ai_fill"
+...

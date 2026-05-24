@@ -63,6 +63,13 @@ if(NOT TARGET Nuke::NDK)
 endif()
 
 # ----------------------------------------------------------------------
+# Find ONNX Runtime (optional - if not present, AISmartFill builds
+# without LaMa support and remains the stub fill from phase 1).
+# ----------------------------------------------------------------------
+
+include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/find_onnxruntime.cmake")
+
+# ----------------------------------------------------------------------
 # Global compile definitions and flags
 # Per NDK_NOTES section 1.3 and 1.4
 # ----------------------------------------------------------------------
@@ -140,6 +147,24 @@ install(DIRECTORY "${NUKE_AI_FILL_PLUGIN_DIR}/"
     FILES_MATCHING PATTERN "*.dll"
 )
 
+# Ship ONNX Runtime DLLs alongside our plugin so the plugin can load
+# them at runtime without requiring ORT to be on PATH. Air-gapped
+# deployment: the receiving machine never touches the network.
+if(ORT_FOUND)
+    install(FILES ${ORT_RUNTIME_DLLS}
+        DESTINATION nuke-ai-fill
+    )
+endif()
+
+# Ship the LaMa model if present at configure time. Place
+# lama_fp32.onnx in the models/ directory next to this CMakeLists.txt
+# and re-run cmake configure for it to be picked up.
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/models/lama_fp32.onnx")
+    install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/models/lama_fp32.onnx"
+        DESTINATION nuke-ai-fill/models
+    )
+endif()
+
 # Append registration to the user's main .nuke/menu.py. The script
 # is idempotent: marker-detected on repeat installs, never overwrites
 # user content. Per NDK_NOTES 8.2.
@@ -162,6 +187,16 @@ message(STATUS "  AISmartFill  : ${BUILD_SMARTFILL}")
 message(STATUS "  AIGenerate   : ${BUILD_GENERATE}")
 if(BUILD_SMARTFILL)
     message(STATUS "  ORT_DIR      : ${ORT_DIR}")
+    message(STATUS "  ORT_FOUND    : ${ORT_FOUND}")
+    if(ORT_FOUND)
+        message(STATUS "  ORT_VERSION  : ${ORT_VERSION_STRING}")
+        message(STATUS "  ORT CUDA EP  : ${ORT_HAS_CUDA_EP}")
+    endif()
+    if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/models/lama_fp32.onnx")
+        message(STATUS "  LaMa model   : present (will be installed)")
+    else()
+        message(STATUS "  LaMa model   : NOT present at models/lama_fp32.onnx")
+    endif()
 endif()
 if(BUILD_GENERATE)
     message(STATUS "  SD_CUDA      : ${SD_CUDA}")
