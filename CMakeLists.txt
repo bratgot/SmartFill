@@ -152,7 +152,7 @@ install(FILES
 # License and readme files install only when they exist at configure
 # time. Avoids CMake's OPTIONAL-flag quirks on Windows; if you add
 # LICENSE later, re-run cmake configure to pick it up.
-foreach(_doc IN ITEMS LICENSE THIRD_PARTY_LICENSES.md README.md)
+foreach(_doc IN ITEMS LICENSE LICENSING.md THIRD_PARTY_LICENSES.md README.md)
     if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${_doc}")
         install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/${_doc}"
                 DESTINATION nuke-ai-fill)

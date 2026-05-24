@@ -29,9 +29,10 @@ $ErrorActionPreference = 'Stop'
 
 $Manifest = @(
     @{ Source = 'PLAN.md';                  Target = 'PLAN.md';                          Ascii = $false },
-    @{ Source = 'README.md';                Target = 'README.md';                        Ascii = $false },
-    @{ Source = 'LICENSE';                  Target = 'LICENSE';                          Ascii = $false },
-    @{ Source = 'THIRD_PARTY_LICENSES.md';  Target = 'THIRD_PARTY_LICENSES.md';          Ascii = $false },
+    @{ Source = 'README.md';                Target = 'README.md';                        Ascii = $true  },
+    @{ Source = 'LICENSE';                  Target = 'LICENSE';                          Ascii = $true  },
+    @{ Source = 'LICENSING.md';             Target = 'LICENSING.md';                     Ascii = $true  },
+    @{ Source = 'THIRD_PARTY_LICENSES.md';  Target = 'THIRD_PARTY_LICENSES.md';          Ascii = $true  },
     @{ Source = '.gitignore';               Target = '.gitignore';                       Ascii = $false },
     @{ Source = 'menu.py';                  Target = 'menu.py';                          Ascii = $false },
     @{ Source = 'install_user_menu.cmake';  Target = 'cmake\install_user_menu.cmake';    Ascii = $true  },
