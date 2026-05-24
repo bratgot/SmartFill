@@ -15,7 +15,7 @@ cmake_minimum_required(VERSION 3.22)
 project(nuke_ai_fill
     VERSION 0.1.0
     DESCRIPTION "MIT/Apache AI inpainting and generation Ops for Nuke 14"
-    LANGUAGES CXX
+    LANGUAGES C CXX
 )
 
 # ----------------------------------------------------------------------
@@ -27,12 +27,20 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Per NDK_NOTES section 1.5: do not allow CMAKE_BUILD_TYPE on multi-config.
-if(CMAKE_CONFIGURATION_TYPES)
-    if(DEFINED CMAKE_BUILD_TYPE AND NOT "${CMAKE_BUILD_TYPE}" STREQUAL "")
-        message(FATAL_ERROR
-            "Do not pass -DCMAKE_BUILD_TYPE on a multi-config generator. "
-            "Use --config Release at build time instead.")
-    endif()
+# Only fire on first configure when the variable came from -D on the command
+# line. Sub-projects like ggml set CMAKE_BUILD_TYPE in their own scope as
+# a fallback default; we should tolerate that. The signal that distinguishes
+# is whether the value was already in the cache before our project() call -
+# CMake stores user-supplied -D values in the cache before processing any
+# CMakeLists.txt.
+get_property(_cbt_helpstring CACHE CMAKE_BUILD_TYPE PROPERTY HELPSTRING)
+if(CMAKE_CONFIGURATION_TYPES
+   AND DEFINED CMAKE_BUILD_TYPE
+   AND NOT "${CMAKE_BUILD_TYPE}" STREQUAL ""
+   AND _cbt_helpstring MATCHES "No help, variable specified on the command line")
+    message(FATAL_ERROR
+        "Do not pass -DCMAKE_BUILD_TYPE on a multi-config generator. "
+        "Use --config Release at build time instead.")
 endif()
 
 # ----------------------------------------------------------------------

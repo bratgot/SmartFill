@@ -32,8 +32,8 @@ AVX_FLAGS:STRING=' '
 //AVX support
 AVX_FOUND:BOOL=TRUE
 
-//No help, variable specified on the command line.
-BUILD_GENERATE:UNINITIALIZED=ON
+//Build AIGenerate Op (stable-diffusion.cpp)
+BUILD_GENERATE:BOOL=ON
 
 BUILD_SHARED_LIBS:BOOL=OFF
 
@@ -941,8 +941,8 @@ OPENGL_gl_LIBRARY:STRING=opengl32
 //GLU library for win32
 OPENGL_glu_LIBRARY:STRING=glu32
 
-//No help, variable specified on the command line.
-ORT_DIR:UNINITIALIZED=C:/dev/onnxruntime-win-x64-gpu-1.20.1
+//Path to onnxruntime-win-x64-gpu install root
+ORT_DIR:PATH=C:/dev/onnxruntime-win-x64-gpu-1.20.1
 
 //CXX compiler flags for OpenMP parallelization
 OpenMP_CXX_FLAGS:STRING=-openmp
@@ -1242,7 +1242,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_MT
 CMAKE_MT-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=1
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=12
 //Platform information initialized
 CMAKE_PLATFORM_INFO_INITIALIZED:INTERNAL=1
 //noop for ranlib
