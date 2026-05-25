@@ -32,12 +32,18 @@
 
 namespace nukeaifill {
 
-// Locations of the four model files FLUX schnell needs.
+// Locations of the four model files FLUX schnell needs, plus an
+// optional ControlNet model file.
 struct SdModelPaths {
     std::string diffusion_model;  // flux1-schnell-Q*_*.gguf
     std::string vae;              // ae.safetensors (FLUX VAE)
     std::string clip_l;           // clip_l.safetensors
     std::string t5xxl;            // t5xxl_fp16.safetensors (or Q8 variant)
+    std::string control_net;      // optional - leave empty for plain txt2img.
+                                  // When set, ensure_loaded() loads this
+                                  // alongside the diffusion model, and
+                                  // generate() applies it provided
+                                  // control_image_rgb is non-empty.
 };
 
 // One LoRA file applied at generation time. sd.cpp accepts a list of these
@@ -67,6 +73,28 @@ struct SdGenerateParams {
     // sd.cpp's apply-and-revert bookkeeping. An empty list means no LoRAs
     // (and reverts any LoRAs from prior generate() calls).
     std::vector<LoRASpec> loras;
+
+    // Optional ControlNet input. Used only when ALL of the following:
+    //   - SdModelPaths::control_net is a valid loaded ControlNet model
+    //   - control_image_rgb is non-empty
+    //   - control_image_width and _height match the buffer length
+    //
+    // Layout: HWC uint8 RGB, TOP-DOWN scanline order (row 0 = top of
+    // image), values 0..255 in sRGB-ish space (sd.cpp does not assume
+    // a specific transfer function but most ControlNets were trained
+    // on sRGB inputs).
+    //
+    // The control image does not have to match width / height; sd.cpp
+    // resamples internally. The control_image's aspect should be close
+    // to the output aspect to avoid distortion.
+    //
+    // control_strength is how strictly the ControlNet enforces its
+    // structural guidance. 1.0 = full strength (default), 0.0 = disabled
+    // (effectively no ControlNet), >1.0 over-emphasizes.
+    std::vector<uint8_t> control_image_rgb;
+    int   control_image_width  = 0;
+    int   control_image_height = 0;
+    float control_strength     = 0.9f;
 };
 
 // Progress callback: (current_step, total_steps) -> continue?

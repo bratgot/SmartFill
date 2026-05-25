@@ -159,7 +159,8 @@ bool SdSession::ensure_loaded(const SdModelPaths& paths,
         && impl_->loaded_paths.diffusion_model == paths.diffusion_model
         && impl_->loaded_paths.vae             == paths.vae
         && impl_->loaded_paths.clip_l          == paths.clip_l
-        && impl_->loaded_paths.t5xxl           == paths.t5xxl) {
+        && impl_->loaded_paths.t5xxl           == paths.t5xxl
+        && impl_->loaded_paths.control_net     == paths.control_net) {
         return true;
     }
 
@@ -189,6 +190,14 @@ bool SdSession::ensure_loaded(const SdModelPaths& paths,
     ctx_params.vae_path             = impl_->loaded_paths.vae.c_str();
     ctx_params.clip_l_path          = impl_->loaded_paths.clip_l.c_str();
     ctx_params.t5xxl_path           = impl_->loaded_paths.t5xxl.c_str();
+
+    // ControlNet model is optional. Leave at _init default (nullptr) when
+    // the user hasn't configured one - sd.cpp then skips ControlNet
+    // setup entirely. When set, sd.cpp loads the file alongside the
+    // diffusion model.
+    if (!impl_->loaded_paths.control_net.empty()) {
+        ctx_params.control_net_path = impl_->loaded_paths.control_net.c_str();
+    }
 
     // Match sd-cli's policy: trust sd_ctx_params_init's defaults for
     // everything except (1) explicit user-controlled options and (2)
@@ -307,6 +316,32 @@ bool SdSession::generate(const SdGenerateParams& params,
     if (!sd_loras.empty()) {
         gen_params.loras      = sd_loras.data();
         gen_params.lora_count = static_cast<int>(sd_loras.size());
+    }
+
+    // ControlNet: attach only when the loaded context has a control_net
+    // AND the caller supplied a control image. The sd_image_t below
+    // borrows the user-provided buffer's memory; params must stay alive
+    // (and unmodified) until generate_image returns.
+    sd_image_t control_image_value{};
+    if (!impl_->loaded_paths.control_net.empty()
+        && !params.control_image_rgb.empty()
+        && params.control_image_width  > 0
+        && params.control_image_height > 0) {
+        const size_t expected =
+            static_cast<size_t>(params.control_image_width) *
+            static_cast<size_t>(params.control_image_height) * 3u;
+        if (params.control_image_rgb.size() == expected) {
+            control_image_value.width   = static_cast<uint32_t>(params.control_image_width);
+            control_image_value.height  = static_cast<uint32_t>(params.control_image_height);
+            control_image_value.channel = 3;
+            control_image_value.data    =
+                const_cast<uint8_t*>(params.control_image_rgb.data());
+            gen_params.control_image    = control_image_value;
+            gen_params.control_strength = params.control_strength;
+        }
+        // If the buffer size doesn't match the declared dimensions,
+        // silently skip ControlNet rather than crash. Caller (Op) is
+        // responsible for getting these consistent.
     }
 
     sd_image_t* result = generate_image(impl_->ctx, &gen_params);

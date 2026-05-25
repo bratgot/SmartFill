@@ -118,18 +118,26 @@ public:
         , cache_dir_("")
         , loras_text_("")
         , loras_dir_("")
+        , control_net_path_("")
+        , control_strength_(0.9f)
         , status_text_("(idle)")
         , last_seed_text_("")
         , last_resolved_seed_(0)
     {
-        inputs(0);
+        inputs(1);
     }
 
     const char* Class() const override     { return description.name; }
     const char* node_help() const override { return AI_GENERATE_HELP; }
 
+    // One optional input: the ControlNet structural-guidance image
+    // (depth map, edge map, etc). Generation works fine with nothing
+    // connected (plain txt2img).
     int minimum_inputs() const override { return 0; }
-    int maximum_inputs() const override { return 0; }
+    int maximum_inputs() const override { return 1; }
+    const char* input_label(int n, char*) const override {
+        return n == 0 ? "ControlNet" : "";
+    }
 
     void knobs(Knob_Callback f) override;
     int  knob_changed(Knob* k) override;
@@ -156,6 +164,8 @@ private:
     const char* cache_dir_;
     const char* loras_text_;
     const char* loras_dir_;
+    const char* control_net_path_;
+    float       control_strength_;
     const char* status_text_;
     const char* last_seed_text_;
 
@@ -311,6 +321,39 @@ void AIGenerate::knobs(Knob_Callback f)
                "LoRAs trained for a different base model "
                "(e.g. SD1.5 LoRAs on a FLUX model) will produce noise or "
                "fail to load.");
+
+    Divider(f, "ControlNet");
+
+    File_knob(f, &control_net_path_, "control_net", "ControlNet Model");
+    Tooltip(f, "Path to a ControlNet model file (.safetensors or .gguf).\n\n"
+               "ControlNet is ACTIVE only when this path is set AND the "
+               "node's input is connected. If either is missing, "
+               "generation is plain txt2img.\n\n"
+               "The connected input should be a structural guidance image - "
+               "an edge map, depth pass, or whatever matches the ControlNet "
+               "model's training data. Convert it from RGB image in Nuke "
+               "(e.g. EdgeDetect or a CG depth pass) before piping it in.\n\n"
+               "Use a ControlNet trained for the same base model as the "
+               "Diffusion Model: FLUX schnell needs a FLUX ControlNet, "
+               "SDXL needs an SDXL ControlNet, etc. Mismatches load but "
+               "produce noise.\n\n"
+               "WARNING: BFL's official FLUX.1-Canny-dev and "
+               "FLUX.1-Depth-dev ControlNets are non-commercial-licensed. "
+               "For commercial studio use, use Apache 2.0 FLUX ControlNets "
+               "from InstantX, Shakker-Labs, or similar (verify each "
+               "model's license).");
+
+    Float_knob(f, &control_strength_, "control_strength", "Control Strength");
+    SetRange(f, 0.0, 2.0);
+    Tooltip(f, "How strictly the ControlNet enforces its structural "
+               "guidance:\n\n"
+               "  1.0   = full strength (default, recommended starting "
+               "point)\n"
+               "  0.5   = soft guide; prompt gets more freedom\n"
+               "  0.0   = effectively disabled\n"
+               "  >1.0  = over-emphasizes structure, may distort\n\n"
+               "Only relevant when ControlNet is active (model path set "
+               "and input connected).");
 }
 
 // ----------------------------------------------------------------------
@@ -479,6 +522,93 @@ void AIGenerate::set_progress(float v)
     }
 }
 
+// Read the connected input as a uint8 RGB top-down buffer suitable for
+// sd.cpp's sd_image_t. Reads at the input's native format dimensions;
+// sd.cpp resizes internally to match generation dimensions if needed.
+//
+// Must be called from start_bake (main thread), NOT from _validate or
+// the worker thread. Iop input cooking is allowed from knob_changed
+// context.
+//
+// Returns true on success, false if input not connected, cook aborted,
+// or wrong channel set. error_out is set on failure.
+static bool read_input_rgb_u8(DD::Image::Iop* in,
+                              std::vector<uint8_t>& out_rgb,
+                              int& out_w,
+                              int& out_h,
+                              std::string& error_out)
+{
+    using namespace DD::Image;
+
+    out_rgb.clear();
+    out_w = 0;
+    out_h = 0;
+
+    if (!in) {
+        error_out = "no input connected";
+        return false;
+    }
+
+    in->validate(true);
+    if (in->aborted()) {
+        error_out = "input validate aborted";
+        return false;
+    }
+
+    const Format& fmt = in->format();
+    const int W = fmt.width();
+    const int H = fmt.height();
+    if (W <= 0 || H <= 0) {
+        error_out = "input format has zero dimensions";
+        return false;
+    }
+
+    // Cap pathological sizes - control images bigger than 4Kx4K make no
+    // sense and would waste memory.
+    if (W > 8192 || H > 8192) {
+        error_out = "input dimensions exceed 8192x8192";
+        return false;
+    }
+
+    in->request(0, 0, W, H, Mask_RGB, 1);
+
+    out_rgb.assign(static_cast<size_t>(W) * H * 3, 0);
+    out_w = W;
+    out_h = H;
+
+    auto to_u8 = [](float v) -> uint8_t {
+        if (v <= 0.0f) return 0;
+        if (v >= 1.0f) return 255;
+        return static_cast<uint8_t>(v * 255.0f + 0.5f);
+    };
+
+    for (int y = 0; y < H; ++y) {
+        Row row(0, W);
+        row.get(*in, y, 0, W, Mask_RGB);
+        if (in->aborted()) {
+            error_out = "input cook aborted at row " + std::to_string(y);
+            return false;
+        }
+
+        // sd.cpp expects top-down scanline order. Nuke's y=0 is bottom,
+        // so flip on write.
+        const int dst_y = (H - 1) - y;
+        uint8_t* dst = &out_rgb[static_cast<size_t>(dst_y) * W * 3];
+
+        const float* r_chan = row[Chan_Red];
+        const float* g_chan = row[Chan_Green];
+        const float* b_chan = row[Chan_Blue];
+
+        for (int x = 0; x < W; ++x) {
+            dst[x * 3 + 0] = to_u8(r_chan[x]);
+            dst[x * 3 + 1] = to_u8(g_chan[x]);
+            dst[x * 3 + 2] = to_u8(b_chan[x]);
+        }
+    }
+
+    return true;
+}
+
 // ----------------------------------------------------------------------
 // Resolve default paths from models_dir if individual paths are empty
 // ----------------------------------------------------------------------
@@ -495,6 +625,7 @@ struct EffectivePaths {
     std::string t5xxl;
     std::string cache_dir;
     std::string loras_dir;
+    std::string control_net;   // empty when knob is empty (no auto-default)
 };
 
 static EffectivePaths compute_effective_paths(
@@ -504,7 +635,8 @@ static EffectivePaths compute_effective_paths(
     const char* clip_l_knob,
     const char* t5xxl_knob,
     const char* cache_dir_knob,
-    const char* loras_dir_knob)
+    const char* loras_dir_knob,
+    const char* control_net_knob)
 {
     auto empty_ck = [](const char* s) { return !s || !*s; };
     auto pick = [&empty_ck](const char* knob_value,
@@ -547,6 +679,11 @@ static EffectivePaths compute_effective_paths(
 
     // LoRAs directory: knob or <models_dir>/loras.
     ep.loras_dir = pick(loras_dir_knob, ep.models_dir + "/loras");
+
+    // ControlNet model: knob only, no auto-default. Empty means
+    // "no ControlNet", which disables the feature entirely.
+    ep.control_net = empty_ck(control_net_knob) ? std::string{}
+                                                 : std::string(control_net_knob);
 
     return ep;
 }
@@ -653,7 +790,8 @@ std::string AIGenerate::compute_cache_key() const
 {
     const EffectivePaths ep = compute_effective_paths(
         models_dir_, diffusion_model_path_, vae_path_,
-        clip_l_path_, t5xxl_path_, cache_dir_, loras_dir_);
+        clip_l_path_, t5xxl_path_, cache_dir_, loras_dir_,
+        control_net_path_);
 
     nf::CacheKeyBuilder kb;
     kb.add(std::string("AIGenerate.v1"));
@@ -680,6 +818,22 @@ std::string AIGenerate::compute_cache_key() const
         kb.add(l.weight);
     }
 
+    // ControlNet state: model path, strength, and if an input is
+    // connected, the upstream node's hash (covers pixel content + format).
+    kb.add(std::string("controlnet"));
+    kb.add(normalize_path(ep.control_net));
+    if (!ep.control_net.empty()) {
+        kb.add(control_strength_);
+        Op* in = const_cast<AIGenerate*>(this)->input(0);
+        if (in) {
+            DD::Image::Hash input_hash;
+            in->append(input_hash);
+            kb.add(static_cast<int64_t>(input_hash.value()));
+        } else {
+            kb.add(std::string("no_input"));
+        }
+    }
+
     return kb.finalize();
 }
 
@@ -687,7 +841,8 @@ std::string AIGenerate::result_path(const std::string& key) const
 {
     const EffectivePaths ep = compute_effective_paths(
         models_dir_, diffusion_model_path_, vae_path_,
-        clip_l_path_, t5xxl_path_, cache_dir_, loras_dir_);
+        clip_l_path_, t5xxl_path_, cache_dir_, loras_dir_,
+        control_net_path_);
     if (ep.cache_dir.empty()) return std::string{};
     return ep.cache_dir + "/" + key + ".aigen";
 }
@@ -722,7 +877,8 @@ void AIGenerate::clear_cache_on_disk()
 {
     const EffectivePaths ep = compute_effective_paths(
         models_dir_, diffusion_model_path_, vae_path_,
-        clip_l_path_, t5xxl_path_, cache_dir_, loras_dir_);
+        clip_l_path_, t5xxl_path_, cache_dir_, loras_dir_,
+        control_net_path_);
     const std::string dir = ep.cache_dir;
     if (dir.empty()) return;
 
@@ -837,7 +993,8 @@ void AIGenerate::start_bake()
     // resolution result is purely a worker-input, not a UI display).
     const EffectivePaths ep = compute_effective_paths(
         models_dir_, diffusion_model_path_, vae_path_,
-        clip_l_path_, t5xxl_path_, cache_dir_, loras_dir_);
+        clip_l_path_, t5xxl_path_, cache_dir_, loras_dir_,
+        control_net_path_);
 
     if (!prompt_ || !*prompt_) {
         error("AIGenerate: empty prompt");
@@ -861,6 +1018,7 @@ void AIGenerate::start_bake()
     paths.vae             = ep.vae;
     paths.clip_l          = ep.clip_l;
     paths.t5xxl           = ep.t5xxl;
+    paths.control_net     = ep.control_net;  // empty when ControlNet off
 
     if (paths.diffusion_model.empty() || paths.vae.empty() ||
         paths.clip_l.empty() || paths.t5xxl.empty()) {
@@ -894,6 +1052,47 @@ void AIGenerate::start_bake()
         error("AIGenerate: missing T5-XXL: %s", paths.t5xxl.c_str());
         set_status("Error: missing T5-XXL file");
         return;
+    }
+    if (!paths.control_net.empty() && !exists(paths.control_net)) {
+        error("AIGenerate: missing ControlNet model: %s",
+              paths.control_net.c_str());
+        set_status("Error: missing ControlNet file");
+        return;
+    }
+
+    // ControlNet input pixels. Only read when BOTH the model path is set
+    // AND the upstream input is connected. If model is set but input is
+    // not, fall through to plain txt2img and warn in the log; this is
+    // usually a setup mistake rather than intent.
+    std::vector<uint8_t> control_image_rgb;
+    int control_image_w = 0;
+    int control_image_h = 0;
+    if (!paths.control_net.empty()) {
+        Iop* control_in = dynamic_cast<Iop*>(input(0));
+        if (control_in) {
+            std::string read_err;
+            if (!read_input_rgb_u8(control_in, control_image_rgb,
+                                   control_image_w, control_image_h,
+                                   read_err)) {
+                error("AIGenerate: ControlNet input read failed: %s",
+                      read_err.c_str());
+                set_status("Error: ControlNet input read failed");
+                return;
+            }
+            std::fprintf(stderr,
+                "[AIGenerate] ControlNet active: %s, %dx%d input, "
+                "strength %.2f\n",
+                paths.control_net.c_str(),
+                control_image_w, control_image_h,
+                static_cast<double>(control_strength_));
+        } else {
+            std::fprintf(stderr,
+                "[AIGenerate] WARNING: ControlNet model is set but no "
+                "input is connected. Falling back to plain txt2img.\n");
+            // Clear path so SdSession doesn't try to load the
+            // ControlNet for nothing.
+            paths.control_net.clear();
+        }
     }
 
     // Resolve seed (random or user-provided), display it, use for key.
@@ -955,8 +1154,13 @@ void AIGenerate::start_bake()
     set_progress(0.0f);
     set_status("Cooking 0%");
 
+    // Capture ControlNet state by value into the worker.
+    const float control_strength_val = control_strength_;
+
     worker_.start([prompt, neg_prompt, W, H, steps, seed, cfg, paths,
-                   cache_path, loras]
+                   cache_path, loras,
+                   control_image_rgb, control_image_w, control_image_h,
+                   control_strength_val]
                   (nf::AiWorkerContext& ctx) {
         ctx.set_status_text("Loading model");
         ctx.set_progress(0.01f);
@@ -981,6 +1185,10 @@ void AIGenerate::start_bake()
         params.seed             = seed;
         params.cfg_scale        = cfg;
         params.loras            = loras;  // captured by-value; strings owned here
+        params.control_image_rgb    = control_image_rgb;
+        params.control_image_width  = control_image_w;
+        params.control_image_height = control_image_h;
+        params.control_strength     = control_strength_val;
 
         // Map sd.cpp's per-step progress (0..steps) into our 5%-90%
         // visible progress band, leaving headroom for cache write.
