@@ -95,7 +95,7 @@ $file_groups = @(
     },
     @{
         Name = "Menu and docs"
-        Items = @("menu.py", "LICENSE", "README.md", "THIRD_PARTY_LICENSES.md")
+        Items = @("menu.py", "LICENSE", "LICENSING.md", "README.md", "THIRD_PARTY_LICENSES.md")
     }
 )
 

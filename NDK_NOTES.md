@@ -1060,8 +1060,242 @@ updates the knobs.
 
 ---
 
-*Updated through the nuke-ai-fill LaMa wiring (May 2026), including
-the Windows-System32-ONNX battle, DDImage knob-storage discovery,
-viewer-refresh investigation, and Carve LaMa-ONNX normalization
-convention. Add an entry here when a new gotcha costs a debugging
-round.*
+## 18. Trust library `_init` functions; override only what you control
+
+When a third-party C API provides struct-init functions (`*_init`,
+`*_defaults`, etc.), the values they set are not placeholder
+defaults -- they encode internal assumptions about how downstream
+code will use the struct. Overriding fields with values that look
+right based on documentation is a common path to silent failures
+that take hours to diagnose.
+
+### 18.1 The stable-diffusion.cpp lesson
+
+We spent half a day debugging FLUX schnell generation producing
+all-white output (every pixel = 1.0). The pipeline ran end-to-end:
+model loaded, conditioner ran, sampling ran for the full 4 steps,
+VAE decoded, image was written to cache. Just every pixel was 1.0.
+
+The cause was NaN propagation through inference. The cause of THAT
+was that we had overridden fields in `sd_ctx_params_t` and
+`sd_img_gen_params_t` with values from sd.cpp's documentation and
+the FLUX paper:
+
+```cpp
+// Looks reasonable. Is wrong.
+ctx_params.prediction              = FLUX_FLOW_PRED;
+ctx_params.wtype                   = SD_TYPE_Q4_0;
+ctx_params.rng_type                = CUDA_RNG;
+ctx_params.sampler_rng_type        = CUDA_RNG;
+ctx_params.backend                 = "CUDA";
+
+gen_params.sample_params.scheduler                   = DISCRETE_SCHEDULER;
+gen_params.sample_params.eta                         = 0.0f;
+gen_params.sample_params.guidance.distilled_guidance = 0.0f;
+gen_params.clip_skip                                 = 0;
+```
+
+Each value justifiable in isolation. Combined, they broke inference.
+
+The fix:
+
+```cpp
+sd_ctx_params_init(&ctx_params);
+
+// Override ONLY the paths and a few essentials:
+ctx_params.diffusion_model_path = ...;
+ctx_params.vae_path             = ...;
+ctx_params.clip_l_path          = ...;
+ctx_params.t5xxl_path           = ...;
+ctx_params.n_threads            = -1;
+ctx_params.vae_decode_only      = false;
+ctx_params.free_params_immediately = false;
+ctx_params.enable_mmap          = false;
+ctx_params.lora_apply_mode      = LORA_APPLY_AUTO;
+
+// Everything else - wtype, prediction, scheduler, RNGs, backend -
+// stays at _init's defaults. sd.cpp auto-detects the right values
+// from the loaded model file.
+```
+
+### 18.2 The diagnostic technique
+
+When a library ships a reference CLI tool, that tool is the ground
+truth for "how this library should be called." For sd.cpp it's
+`sd-cli.exe`; for ONNX Runtime it's `onnxruntime_perf_test`; etc.
+
+If your library call isn't producing expected output, run the
+reference CLI with the SAME inputs and `-v`/`--verbose` to get a
+dump of the parameter struct. Compare its values against yours,
+field by field. The divergence will jump out:
+
+```
+sd-cli (works):                  our code (broken):
+  wtype: NONE                      wtype: Q4_0
+  prediction: NONE                 prediction: FLUX_FLOW_PRED
+  scheduler: NONE                  scheduler: DISCRETE_SCHEDULER
+  eta: inf  (sentinel)             eta: 0.0
+  distilled_guidance: 3.50         distilled_guidance: 0.0
+```
+
+`NONE` and `inf` in those dumps are sentinel values that mean
+"use the library's auto-detect / sampler-default behavior." They
+are NOT placeholder zeros. Setting them to `0` or `0.0f` is what
+causes the NaN cascade.
+
+### 18.3 General principle
+
+For any library struct with an `_init` function:
+
+1. Call `_init` first.
+2. Override the user-controlled fields (paths, dimensions, prompts).
+3. Override fields where you have a documented, non-default reason
+   (vae_decode_only=false because we may add img2img later).
+4. Leave everything else alone.
+
+Comments documenting why you DIDN'T set certain fields are as
+valuable as comments documenting why you DID set others. Both
+save the next person (often future you) hours of debugging.
+
+---
+
+## 19. Diffusion VAE compute buffer is the hidden VRAM cost
+
+When budgeting VRAM for diffusion model inference, the model
+weights are not the largest allocation. The VAE decode compute
+buffer can be larger than the entire diffusion model.
+
+### 19.1 Numbers for FLUX at 1024x1024
+
+```
+flux params (weights):     ~6.5 GB
+flux compute buffer:       ~2.4 GB
+t5 params (weights):       ~4.8 GB
+clip_l params (weights):   ~0.25 GB
+vae params (weights):      ~0.16 GB
+vae compute buffer:        ~6.6 GB    <-- larger than everything else
+```
+
+This is allocated AFTER the diffusion sampling completes, just
+before the latent gets decoded. So a generation can sample
+successfully through all 4 (or 20, or 50) denoising steps and
+then OOM during VAE decode.
+
+### 19.2 VAE tiling fixes it
+
+sd.cpp exposes tiled VAE decode that splits the latent into tiles
+and decodes them one at a time. Compute buffer drops to a few
+hundred MB:
+
+```cpp
+gen_params.vae_tiling_params.enabled         = true;
+gen_params.vae_tiling_params.temporal_tiling = false;
+gen_params.vae_tiling_params.tile_size_x     = 0;     // auto
+gen_params.vae_tiling_params.tile_size_y     = 0;
+gen_params.vae_tiling_params.target_overlap  = 0.5f;
+gen_params.vae_tiling_params.rel_size_x      = 0.5f;  // tile = 1/2 image
+gen_params.vae_tiling_params.rel_size_y      = 0.5f;
+gen_params.vae_tiling_params.extra_tiling_args = nullptr;
+```
+
+Trade-off: tiled decode is ~20% slower (the overlap region gets
+decoded twice and blended). Seams between tiles are visible if
+overlap is small; 0.5 overlap hides them effectively.
+
+For FLUX at 1024x1024 with `rel_size = 0.5`, sd.cpp uses 9 tiles
+(3x3) of 512x512 with overlap blending, dropping VAE buffer from
+6.6 GB to ~1.5 GB.
+
+### 19.3 General pattern
+
+For any image-generative model:
+- Model weights = "static" VRAM (loaded once, reused).
+- Sampling compute buffer = activations during denoising.
+- VAE/decoder compute buffer = activations during pixel synthesis.
+
+The last one is usually the biggest single allocation and gets
+forgotten in capacity planning. If your card has tight VRAM, look
+for the tiling/chunked-decode option before lowering quality.
+
+---
+
+## 20. GGUF file format compatibility is not implied by extension
+
+GGUF is a container format, not a quantization scheme. Files with
+the same `.gguf` extension and similar names can use different
+internal conventions for quantization scale storage. They will
+load successfully in libraries that don't recognize the mismatch,
+then produce garbage during inference.
+
+### 20.1 The specific incompatibility we hit
+
+`flux1-schnell-Q4_K.gguf` files exist in multiple HuggingFace
+repos:
+
+| Repo | Target tool | Works with sd.cpp? |
+|---|---|---|
+| `leejet/FLUX.1-schnell-gguf` | stable-diffusion.cpp | yes |
+| `city96/FLUX.1-schnell-gguf` | ComfyUI-GGUF custom node | NO |
+| `lllyasviel/FLUX.1-schnell-gguf` | ComfyUI-GGUF custom node | NO |
+| `unsloth/FLUX.1-schnell-GGUF` | Unsloth | unknown |
+| `calcuis/flux1-gguf` | unclear | NO |
+
+These files all open with sd.cpp's GGUF loader. The tensor counts
+match. The architecture detection succeeds (sd.cpp prints "Version:
+Flux"). The model loads. Inference runs. The output is white.
+
+The bug is that ComfyUI-GGUF stores Q4_K scale factors in a
+different block layout than what sd.cpp dequantizes. sd.cpp reads
+the wrong bytes as scale factors, dequantizes weights to garbage,
+the weights produce NaN activations, the VAE saturates output to
+1.0.
+
+### 20.2 How to tell
+
+Only safe heuristic: source from the same author or repo that
+shipped the inference library. For sd.cpp specifically:
+
+- `leejet/FLUX.1-schnell-gguf` (only `Q2_K`, `Q4_0`, `Q8_0` exist)
+- `leejet/FLUX.1-dev-gguf` (same three quants)
+
+If a quant doesn't exist in leejet's repo (e.g. Q4_K, Q3_K, Q5_K
+for FLUX schnell), do NOT use a stand-in from another repo with
+the same name. Pick a different quant level that leejet ships.
+
+### 20.3 The diagnostic that catches this
+
+```python
+# python diagnostic for image cache files containing model output
+import struct, numpy as np
+with open(cache_path, 'rb') as f:
+    f.read(8)
+    version, w, h, c, _ = struct.unpack('<IIIII', f.read(20))
+    data = np.frombuffer(f.read(), dtype=np.float32).reshape(h, w, c)
+print(f'min={data.min()} max={data.max()} std={data.std()}')
+```
+
+`min=max=1.0, std=0.0` means every pixel is saturated. Combined
+with "inference ran without errors," this points at NaN in the
+latent, which means dequantization or matmul produced NaN, which
+most often means file format mismatch.
+
+If the diagnostic shows a real image (`std > 0.1`, varied
+percentiles), you're past this class of bug.
+
+### 20.4 The general principle
+
+GGUF, ONNX, safetensors, .pt -- these are all containers, not
+contracts. "It loaded successfully" tells you nothing about whether
+the values inside will produce correct math. When debugging a
+generative model that "runs but produces garbage," **swap the
+weight file before tweaking anything in the inference config.**
+
+---
+
+*Updated through the nuke-ai-fill FLUX integration (May 2026),
+including the Windows-System32-ONNX battle, DDImage knob-storage
+discovery, viewer-refresh investigation, Carve LaMa-ONNX
+normalization convention, sd.cpp _init-defaults discipline, VAE
+tiling for VRAM headroom, and GGUF file-format-vs-tool
+compatibility. Add an entry here when a new gotcha costs a
+debugging round.*

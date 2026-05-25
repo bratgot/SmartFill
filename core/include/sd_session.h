@@ -40,6 +40,19 @@ struct SdModelPaths {
     std::string t5xxl;            // t5xxl_fp16.safetensors (or Q8 variant)
 };
 
+// One LoRA file applied at generation time. sd.cpp accepts a list of these
+// in sd_img_gen_params_t.loras. The path must point to a file in
+// .safetensors or .gguf format compatible with the loaded base model
+// (e.g. FLUX-trained LoRAs only work with FLUX). Multiplier is the
+// strength: 1.0 = full effect, 0.5 = half, negative values invert.
+//
+// We do not currently expose is_high_noise (only used for Wan video models)
+// or any of the LoRA-apply-mode flags - sd.cpp handles those automatically.
+struct LoRASpec {
+    std::string path;
+    float       weight = 1.0f;
+};
+
 // Per-generation parameters.
 struct SdGenerateParams {
     std::string prompt;
@@ -49,6 +62,11 @@ struct SdGenerateParams {
     int     steps      = 4;       // schnell distilled for <=4 steps
     int64_t seed       = -1;      // -1 = random per call
     float   cfg_scale  = 1.0f;    // schnell does not use CFG; keep at 1.0
+
+    // Optional LoRAs to apply on this generation. Order matters for
+    // sd.cpp's apply-and-revert bookkeeping. An empty list means no LoRAs
+    // (and reverts any LoRAs from prior generate() calls).
+    std::vector<LoRASpec> loras;
 };
 
 // Progress callback: (current_step, total_steps) -> continue?

@@ -43,6 +43,7 @@
 #include <cstring>
 #include <filesystem>
 #include <random>
+#include <sstream>
 #include <string>
 #include <system_error>
 #include <vector>
@@ -115,6 +116,8 @@ public:
         , clip_l_path_("")
         , t5xxl_path_("")
         , cache_dir_("")
+        , loras_text_("")
+        , loras_dir_("")
         , status_text_("(idle)")
         , last_seed_text_("")
         , last_resolved_seed_(0)
@@ -151,6 +154,8 @@ private:
     const char* clip_l_path_;
     const char* t5xxl_path_;
     const char* cache_dir_;
+    const char* loras_text_;
+    const char* loras_dir_;
     const char* status_text_;
     const char* last_seed_text_;
 
@@ -260,19 +265,21 @@ void AIGenerate::knobs(Knob_Callback f)
     Divider(f, "Individual model paths (override)");
 
     File_knob(f, &diffusion_model_path_, "diffusion_model", "Diffusion Model");
-    Tooltip(f, "FLUX schnell GGUF (e.g. flux1-schnell-Q4_K.gguf). "
+    Tooltip(f, "FLUX schnell GGUF (default: flux1-schnell-q4_0.gguf from "
+               "huggingface.co/leejet/FLUX.1-schnell-gguf). "
                "If empty, derived from Models Directory.");
 
     File_knob(f, &vae_path_, "vae", "VAE");
-    Tooltip(f, "FLUX VAE (ae.safetensors). "
+    Tooltip(f, "FLUX VAE (default: ae.safetensors). "
                "If empty, derived from Models Directory.");
 
     File_knob(f, &clip_l_path_, "clip_l", "CLIP-L");
-    Tooltip(f, "CLIP-L text encoder (clip_l.safetensors). "
+    Tooltip(f, "CLIP-L text encoder (default: clip_l.safetensors). "
                "If empty, derived from Models Directory.");
 
     File_knob(f, &t5xxl_path_, "t5xxl", "T5-XXL");
-    Tooltip(f, "T5-XXL text encoder (t5xxl_fp16.safetensors or Q8 variant). "
+    Tooltip(f, "T5-XXL text encoder (default: t5-v1_1-xxl-encoder-Q8_0.gguf "
+               "from huggingface.co/city96/t5-v1_1-xxl-encoder-gguf). "
                "If empty, derived from Models Directory.");
 
     Divider(f, "");
@@ -280,6 +287,30 @@ void AIGenerate::knobs(Knob_Callback f)
     File_knob(f, &cache_dir_, "cache_dir", "Cache Directory");
     Tooltip(f, "Where cached generations are stored. If empty, defaults "
                "to %APPDATA%\\nuke-ai-fill\\cache");
+
+    Divider(f, "LoRAs");
+
+    File_knob(f, &loras_dir_, "loras_dir", "LoRAs Directory");
+    Tooltip(f, "Directory containing LoRA files. Used to resolve relative "
+               "filenames in the LoRAs list. If empty, defaults to "
+               "<Models Directory>/loras/.");
+
+    Multiline_String_knob(f, &loras_text_, "loras", "LoRAs");
+    SetFlags(f, Knob::NO_ANIMATION);
+    Tooltip(f, "LoRAs to apply on each bake. One per line.\n\n"
+               "Format:  path_or_filename : weight\n\n"
+               "- path: absolute, or relative to LoRAs Directory\n"
+               "- weight: float, typically 0.0 to 1.5 (default 1.0)\n"
+               "- lines starting with # are comments\n"
+               "- blank lines are ignored\n\n"
+               "Example:\n"
+               "  mystyle.safetensors : 0.8\n"
+               "  C:/loras/character.safetensors : 1.0\n"
+               "  # weight defaults to 1.0\n"
+               "  another_style.safetensors\n\n"
+               "LoRAs trained for a different base model "
+               "(e.g. SD1.5 LoRAs on a FLUX model) will produce noise or "
+               "fail to load.");
 }
 
 // ----------------------------------------------------------------------
@@ -293,8 +324,6 @@ int AIGenerate::knob_changed(Knob* k)
     const char* name = k->name().c_str();
 
     if (std::strcmp(name, "bake") == 0) {
-        std::fprintf(stderr, "[AIGenerate] Bake button pressed\n");
-        std::fflush(stderr);
         start_bake();
         return 1;
     }
@@ -465,6 +494,7 @@ struct EffectivePaths {
     std::string clip_l;
     std::string t5xxl;
     std::string cache_dir;
+    std::string loras_dir;
 };
 
 static EffectivePaths compute_effective_paths(
@@ -473,7 +503,8 @@ static EffectivePaths compute_effective_paths(
     const char* vae_knob,
     const char* clip_l_knob,
     const char* t5xxl_knob,
-    const char* cache_dir_knob)
+    const char* cache_dir_knob,
+    const char* loras_dir_knob)
 {
     auto empty_ck = [](const char* s) { return !s || !*s; };
     auto pick = [&empty_ck](const char* knob_value,
@@ -501,16 +532,95 @@ static EffectivePaths compute_effective_paths(
     }
 
     // Individual file paths: knob or <models_dir>/<expected filename>.
+    // Defaults match leejet's canonical FLUX schnell file set:
+    //   - flux1-schnell-q4_0.gguf (NOT Q4_K - see NDK_NOTES section 20)
+    //   - t5-v1_1-xxl-encoder-Q8_0.gguf (city96's Q8 GGUF works in sd.cpp)
+    //   - ae.safetensors / clip_l.safetensors stay as the BFL/OpenAI files
     ep.diffusion_model = pick(diffusion_knob,
-                              ep.models_dir + "/flux1-schnell-Q4_K.gguf");
+                              ep.models_dir + "/flux1-schnell-q4_0.gguf");
     ep.vae             = pick(vae_knob,
                               ep.models_dir + "/ae.safetensors");
     ep.clip_l          = pick(clip_l_knob,
                               ep.models_dir + "/clip_l.safetensors");
     ep.t5xxl           = pick(t5xxl_knob,
-                              ep.models_dir + "/t5xxl_fp16.safetensors");
+                              ep.models_dir + "/t5-v1_1-xxl-encoder-Q8_0.gguf");
+
+    // LoRAs directory: knob or <models_dir>/loras.
+    ep.loras_dir = pick(loras_dir_knob, ep.models_dir + "/loras");
 
     return ep;
+}
+
+// Parse the multi-line LoRA spec string into a list of (path, weight)
+// records. Format:
+//   path : weight    (weight defaults to 1.0)
+//   # comment        (ignored)
+//   <blank>          (ignored)
+// Relative paths are resolved against effective_loras_dir.
+// LoRAs with weight 0.0 are skipped (no effect anyway).
+static std::vector<nf::LoRASpec> parse_loras(
+    const char* loras_text_knob,
+    const std::string& effective_loras_dir)
+{
+    std::vector<nf::LoRASpec> result;
+    if (!loras_text_knob || !*loras_text_knob) return result;
+
+    auto trim = [](std::string& s) {
+        const size_t a = s.find_first_not_of(" \t\r\n");
+        if (a == std::string::npos) { s.clear(); return; }
+        const size_t b = s.find_last_not_of(" \t\r\n");
+        s = s.substr(a, b - a + 1);
+    };
+
+    std::istringstream iss(loras_text_knob);
+    std::string line;
+    while (std::getline(iss, line)) {
+        trim(line);
+        if (line.empty() || line[0] == '#') continue;
+
+        // Split "path : weight" by the LAST colon. Windows drive-letter
+        // colons (position 1, e.g. "C:") must NOT be treated as the weight
+        // separator - hence rfind plus the > 1 guard.
+        std::string path;
+        float weight = 1.0f;
+        const size_t colon_pos = line.rfind(':');
+        if (colon_pos != std::string::npos && colon_pos > 1) {
+            std::string maybe_w = line.substr(colon_pos + 1);
+            trim(maybe_w);
+            try {
+                size_t consumed = 0;
+                const float w = std::stof(maybe_w, &consumed);
+                if (consumed == maybe_w.size()) {
+                    weight = w;
+                    path = line.substr(0, colon_pos);
+                    trim(path);
+                } else {
+                    path = line;  // trailing junk - not a weight
+                }
+            } catch (...) {
+                path = line;  // not a float - treat whole line as path
+            }
+        } else {
+            path = line;
+        }
+
+        if (path.empty()) continue;
+        if (weight == 0.0f) continue;  // no-op LoRA
+
+        // Resolve relative path against the loras_dir.
+        bool is_absolute = false;
+        if (path.size() >= 1 && (path[0] == '/' || path[0] == '\\')) is_absolute = true;
+        if (path.size() >= 2 && path[1] == ':') is_absolute = true;
+        if (!is_absolute && !effective_loras_dir.empty()) {
+            path = effective_loras_dir + "/" + path;
+        }
+
+        nf::LoRASpec spec;
+        spec.path   = std::move(path);
+        spec.weight = weight;
+        result.push_back(std::move(spec));
+    }
+    return result;
 }
 
 // ----------------------------------------------------------------------
@@ -543,7 +653,7 @@ std::string AIGenerate::compute_cache_key() const
 {
     const EffectivePaths ep = compute_effective_paths(
         models_dir_, diffusion_model_path_, vae_path_,
-        clip_l_path_, t5xxl_path_, cache_dir_);
+        clip_l_path_, t5xxl_path_, cache_dir_, loras_dir_);
 
     nf::CacheKeyBuilder kb;
     kb.add(std::string("AIGenerate.v1"));
@@ -558,6 +668,18 @@ std::string AIGenerate::compute_cache_key() const
     kb.add(normalize_path(ep.vae));
     kb.add(normalize_path(ep.clip_l));
     kb.add(normalize_path(ep.t5xxl));
+
+    // LoRAs are part of the input identity - same prompt with a different
+    // LoRA stack produces a different image. Include each resolved path
+    // and weight in the hash, in order.
+    const std::vector<nf::LoRASpec> loras = parse_loras(loras_text_, ep.loras_dir);
+    kb.add(std::string("loras"));
+    kb.add(static_cast<int32_t>(loras.size()));
+    for (const auto& l : loras) {
+        kb.add(normalize_path(l.path));
+        kb.add(l.weight);
+    }
+
     return kb.finalize();
 }
 
@@ -565,7 +687,7 @@ std::string AIGenerate::result_path(const std::string& key) const
 {
     const EffectivePaths ep = compute_effective_paths(
         models_dir_, diffusion_model_path_, vae_path_,
-        clip_l_path_, t5xxl_path_, cache_dir_);
+        clip_l_path_, t5xxl_path_, cache_dir_, loras_dir_);
     if (ep.cache_dir.empty()) return std::string{};
     return ep.cache_dir + "/" + key + ".aigen";
 }
@@ -600,7 +722,7 @@ void AIGenerate::clear_cache_on_disk()
 {
     const EffectivePaths ep = compute_effective_paths(
         models_dir_, diffusion_model_path_, vae_path_,
-        clip_l_path_, t5xxl_path_, cache_dir_);
+        clip_l_path_, t5xxl_path_, cache_dir_, loras_dir_);
     const std::string dir = ep.cache_dir;
     if (dir.empty()) return;
 
@@ -715,7 +837,7 @@ void AIGenerate::start_bake()
     // resolution result is purely a worker-input, not a UI display).
     const EffectivePaths ep = compute_effective_paths(
         models_dir_, diffusion_model_path_, vae_path_,
-        clip_l_path_, t5xxl_path_, cache_dir_);
+        clip_l_path_, t5xxl_path_, cache_dir_, loras_dir_);
 
     if (!prompt_ || !*prompt_) {
         error("AIGenerate: empty prompt");
@@ -808,34 +930,44 @@ void AIGenerate::start_bake()
     const std::string neg_prompt = ck_str(negative_prompt_);
     const std::string cache_path = path;
 
+    // Resolve LoRAs against effective loras_dir. parse_loras drops
+    // weight-0 entries and resolves relative paths.
+    std::vector<nf::LoRASpec> loras = parse_loras(loras_text_, ep.loras_dir);
+
+    // Validate every LoRA file actually exists, else the worker will
+    // fail mysteriously inside sd.cpp. Drop missing ones and warn.
+    {
+        std::vector<nf::LoRASpec> kept;
+        kept.reserve(loras.size());
+        for (const auto& l : loras) {
+            if (fs::exists(fs::u8path(l.path), ec)) {
+                kept.push_back(l);
+            } else {
+                std::fprintf(stderr,
+                    "[AIGenerate] LoRA file not found, skipping: %s\n",
+                    l.path.c_str());
+            }
+        }
+        loras = std::move(kept);
+    }
+
     baking_key_ = key;
     set_progress(0.0f);
     set_status("Cooking 0%");
 
     worker_.start([prompt, neg_prompt, W, H, steps, seed, cfg, paths,
-                   cache_path]
+                   cache_path, loras]
                   (nf::AiWorkerContext& ctx) {
-        std::fprintf(stderr, "[AIGenerate] worker started\n"); std::fflush(stderr);
         ctx.set_status_text("Loading model");
         ctx.set_progress(0.01f);
 
-        std::fprintf(stderr, "[AIGenerate] paths:\n  diffusion=%s\n  vae=%s\n  clip_l=%s\n  t5xxl=%s\n",
-                     paths.diffusion_model.c_str(),
-                     paths.vae.c_str(),
-                     paths.clip_l.c_str(),
-                     paths.t5xxl.c_str());
-        std::fflush(stderr);
 
         std::string err;
-        std::fprintf(stderr, "[AIGenerate] calling get_session()\n"); std::fflush(stderr);
         auto& sess = get_session();
-        std::fprintf(stderr, "[AIGenerate] calling ensure_loaded()\n"); std::fflush(stderr);
         if (!sess.ensure_loaded(paths, err)) {
             std::fprintf(stderr, "[AIGenerate] ensure_loaded FAILED: %s\n", err.c_str());
-            std::fflush(stderr);
             throw std::runtime_error("Model load failed: " + err);
         }
-        std::fprintf(stderr, "[AIGenerate] ensure_loaded OK\n"); std::fflush(stderr);
 
         ctx.set_status_text("Generating");
         ctx.set_progress(0.05f);
@@ -848,12 +980,11 @@ void AIGenerate::start_bake()
         params.steps            = steps;
         params.seed             = seed;
         params.cfg_scale        = cfg;
+        params.loras            = loras;  // captured by-value; strings owned here
 
         // Map sd.cpp's per-step progress (0..steps) into our 5%-90%
         // visible progress band, leaving headroom for cache write.
         auto progress_cb = [&ctx](int step, int total) -> bool {
-            std::fprintf(stderr, "[AIGenerate] denoise step %d/%d\n", step, total);
-            std::fflush(stderr);
             if (total > 0) {
                 float frac = static_cast<float>(step) /
                              static_cast<float>(total);
@@ -864,14 +995,11 @@ void AIGenerate::start_bake()
 
         std::vector<float> out_rgb;
         int out_w = 0, out_h = 0;
-        std::fprintf(stderr, "[AIGenerate] calling sess.generate()\n"); std::fflush(stderr);
         if (!sess.generate(params, out_rgb, out_w, out_h,
                            progress_cb, err)) {
             std::fprintf(stderr, "[AIGenerate] generate FAILED: %s\n", err.c_str());
-            std::fflush(stderr);
             throw std::runtime_error("Generation failed: " + err);
         }
-        std::fprintf(stderr, "[AIGenerate] generate OK: %dx%d\n", out_w, out_h); std::fflush(stderr);
         if (out_w != W || out_h != H) {
             throw std::runtime_error("Output dimensions mismatch");
         }
@@ -884,7 +1012,6 @@ void AIGenerate::start_bake()
             throw std::runtime_error(
                 std::string("failed to write cache file: ") + cache_path);
         }
-        std::fprintf(stderr, "[AIGenerate] cache written, done\n"); std::fflush(stderr);
         ctx.set_progress(1.0f);
     });
 #endif // NUKE_AI_FILL_HAS_SD

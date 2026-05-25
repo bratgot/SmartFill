@@ -55439,3 +55439,1066 @@ events:
         - "C:/Program Files/CMake"
         - "C:/Program Files/nuke_ai_fill"
 ...
+
+---
+events:
+  -
+    kind: "find-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/FindCUDAToolkit.cmake:1101 (find_path)"
+      - "third_party/stable-diffusion.cpp/ggml/src/ggml-cuda/CMakeLists.txt:3 (find_package)"
+    mode: "path"
+    variable: "CUDAToolkit_CUBLAS_INCLUDE_DIR"
+    description: "Path to a file."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "cublas_v2.h"
+    candidate_directories:
+      - "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/include/"
+    found: "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.9/include/"
+    search_context:
+      package_stack:
+        -
+          package_paths:
+            - "C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9"
+      ENV{PATH}:
+        - "C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\bin"
+        - "C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\libnvvp"
+        - "C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v11.8\\bin"
+        - "C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v11.8\\libnvvp"
+        - "C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.6\\bin"
+        - "C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.6\\libnvvp"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\Docker\\Docker\\resources\\bin"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Strawberry\\c\\bin"
+        - "C:\\Strawberry\\perl\\site\\bin"
+        - "C:\\Strawberry\\perl\\bin"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\NVIDIA Corporation\\Nsight Compute 2025.2.1\\"
+        - "C:\\Program Files\\NVIDIA Corporation\\NVIDIA App\\NvDLISR"
+        - "C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\bin"
+        - "C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.9\\libnvvp"
+        - "C:\\Users\\marty\\.cargo\\bin"
+        - "C:\\Users\\marty\\AppData\\Local\\Programs\\Python\\Python311\\Scripts\\"
+        - "C:\\Users\\marty\\AppData\\Local\\Programs\\Python\\Python311\\"
+        - "C:\\Users\\marty\\AppData\\Local\\Programs\\Python\\Python314\\Scripts\\"
+        - "C:\\Users\\marty\\AppData\\Local\\Programs\\Python\\Python314\\"
+        - "C:\\Users\\marty\\AppData\\Local\\Programs\\Python\\Launcher\\"
+        - "C:\\Users\\marty\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\marty\\AppData\\Local\\Python\\bin"
+        - "C:\\Users\\marty\\AppData\\Local\\Microsoft\\WinGet\\Packages\\lucasg.Dependencies_Microsoft.Winget.Source_8wekyb3d8bbwe"
+        - "C:\\vcpkg"
+      CMAKE_INSTALL_PREFIX: "C:/Program Files/nuke_ai_fill"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "C:/Program Files"
+        - "C:/Program Files (x86)"
+        - "C:/Program Files/CMake"
+        - "C:/Program Files/nuke_ai_fill"
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/Internal/CheckSourceCompiles.cmake:104 (try_compile)"
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CheckCSourceCompiles.cmake:103 (cmake_check_source_compiles)"
+      - "third_party/stable-diffusion.cpp/thirdparty/libwebp/cmake/cpu.cmake:32 (check_c_source_compiles)"
+      - "third_party/stable-diffusion.cpp/thirdparty/libwebp/cmake/cpu.cmake:117 (webp_check_compiler_flag)"
+      - "third_party/stable-diffusion.cpp/thirdparty/libwebp/cmake/deps.cmake:112 (include)"
+      - "third_party/stable-diffusion.cpp/thirdparty/libwebp/CMakeLists.txt:123 (include)"
+    checks:
+      - "Performing Test WEBP_HAVE_FLAG_AVX2"
+    directories:
+      source: "C:/dev/SmartFill/build/CMakeFiles/CMakeScratch/TryCompile-ll421s"
+      binary: "C:/dev/SmartFill/build/CMakeFiles/CMakeScratch/TryCompile-ll421s"
+    cmakeVariables:
+      CMAKE_CUDA_ARCHITECTURES: "120"
+      CMAKE_CXX_STDLIB_MODULES_JSON: ""
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
+      CMAKE_C_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_POSITION_INDEPENDENT_CODE: "ON"
+    buildResult:
+      variable: "WEBP_HAVE_FLAG_AVX2"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/dev/SmartFill/build/CMakeFiles/CMakeScratch/TryCompile-ll421s'
+        
+        Run Build Command(s): "C:/Program Files (x86)/Microsoft Visual Studio/2019/BuildTools/MSBuild/Current/Bin/MSBuild.exe" cmTC_87e52.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=16.0 /v:n
+        Microsoft (R) Build Engine version 16.11.6+a918ceb31 for .NET Framework
+        Copyright (C) Microsoft Corporation. All rights reserved.
+        
+        Build started 25/05/2026 9:21:25 AM.
+        Project "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-ll421s\\cmTC_87e52.vcxproj" on node 1 (default targets).
+        PrepareForBuild:
+          Creating directory "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-ll421s\\Debug\\".
+          Creating directory "cmTC_87e52.dir\\Debug\\cmTC_87e52.tlog\\".
+        InitializeBuildStatus:
+          Creating "cmTC_87e52.dir\\Debug\\cmTC_87e52.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+        VcpkgTripletSelection:
+          Using triplet "x64-windows" from "C:\\vcpkg\\installed\\x64-windows\\"
+          Using normalized configuration "Debug"
+        ClCompile:
+          C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Tools\\MSVC\\14.29.30133\\bin\\HostX64\\x64\\CL.exe /c /I"C:\\dev\\SmartFill\\third_party\\stable-diffusion.cpp\\thirdparty\\libwebp" /I"C:\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D WEBP_HAVE_FLAG_AVX2 /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /std:c11 /Fo"cmTC_87e52.dir\\Debug\\\\" /Fd"cmTC_87e52.dir\\Debug\\vc142.pdb" /external:W1 /TC /errorReport:queue "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-ll421s\\src.c"
+          Microsoft (R) C/C++ Optimizing Compiler Version 19.29.30159 for x64
+          src.c
+          Copyright (C) Microsoft Corporation.  All rights reserved.
+          cl /c /I"C:\\dev\\SmartFill\\third_party\\stable-diffusion.cpp\\thirdparty\\libwebp" /I"C:\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D WEBP_HAVE_FLAG_AVX2 /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /std:c11 /Fo"cmTC_87e52.dir\\Debug\\\\" /Fd"cmTC_87e52.dir\\Debug\\vc142.pdb" /external:W1 /TC /errorReport:queue "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-ll421s\\src.c"
+        Link:
+          C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Tools\\MSVC\\14.29.30133\\bin\\HostX64\\x64\\link.exe /OUT:"C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-ll421s\\Debug\\cmTC_87e52.exe" /INCREMENTAL /ILK:"cmTC_87e52.dir\\Debug\\cmTC_87e52.ilk" /NOLOGO /LIBPATH:"C:\\vcpkg\\installed\\x64-windows\\debug\\lib" /LIBPATH:"C:\\vcpkg\\installed\\x64-windows\\debug\\lib\\manual-link" kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib "C:\\vcpkg\\installed\\x64-windows\\debug\\lib\\*.lib" /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/dev/SmartFill/build/CMakeFiles/CMakeScratch/TryCompile-ll421s/Debug/cmTC_87e52.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /IMPLIB:"C:/dev/SmartFill/build/CMakeFiles/CMakeScratch/TryCompile-ll421s/Debug/cmTC_87e52.lib" /MACHINE:X64  /machine:x64 cmTC_87e52.dir\\Debug\\src.obj
+          cmTC_87e52.vcxproj -> C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-ll421s\\Debug\\cmTC_87e52.exe
+        AppLocalFromInstalled:
+          pwsh.exe -ExecutionPolicy Bypass -noprofile -File "C:\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-ll421s\\Debug\\cmTC_87e52.exe" "C:\\vcpkg\\installed\\x64-windows\\debug\\bin" "cmTC_87e52.dir\\Debug\\cmTC_87e52.tlog\\cmTC_87e52.write.1u.tlog" "cmTC_87e52.dir\\Debug\\vcpkg.applocal.log"
+          'pwsh.exe' is not recognized as an internal or external command,
+          operable program or batch file.
+          The command "pwsh.exe -ExecutionPolicy Bypass -noprofile -File "C:\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-ll421s\\Debug\\cmTC_87e52.exe" "C:\\vcpkg\\installed\\x64-windows\\debug\\bin" "cmTC_87e52.dir\\Debug\\cmTC_87e52.tlog\\cmTC_87e52.write.1u.tlog" "cmTC_87e52.dir\\Debug\\vcpkg.applocal.log"" exited with code 9009.
+          "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -ExecutionPolicy Bypass -noprofile -File "C:\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-ll421s\\Debug\\cmTC_87e52.exe" "C:\\vcpkg\\installed\\x64-windows\\debug\\bin" "cmTC_87e52.dir\\Debug\\cmTC_87e52.tlog\\cmTC_87e52.write.1u.tlog" "cmTC_87e52.dir\\Debug\\vcpkg.applocal.log"
+        FinalizeBuildStatus:
+          Deleting file "cmTC_87e52.dir\\Debug\\cmTC_87e52.tlog\\unsuccessfulbuild".
+          Touching "cmTC_87e52.dir\\Debug\\cmTC_87e52.tlog\\cmTC_87e52.lastbuildstate".
+        Done Building Project "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-ll421s\\cmTC_87e52.vcxproj" (default targets).
+        
+        Build succeeded.
+            0 Warning(s)
+            0 Error(s)
+        
+        Time Elapsed 00:00:01.80
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/Internal/CheckSourceCompiles.cmake:104 (try_compile)"
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CheckCSourceCompiles.cmake:103 (cmake_check_source_compiles)"
+      - "third_party/stable-diffusion.cpp/thirdparty/libwebp/cmake/cpu.cmake:32 (check_c_source_compiles)"
+      - "third_party/stable-diffusion.cpp/thirdparty/libwebp/cmake/cpu.cmake:117 (webp_check_compiler_flag)"
+      - "third_party/stable-diffusion.cpp/thirdparty/libwebp/cmake/deps.cmake:112 (include)"
+      - "third_party/stable-diffusion.cpp/thirdparty/libwebp/CMakeLists.txt:123 (include)"
+    checks:
+      - "Performing Test WEBP_HAVE_FLAG_SSE41"
+    directories:
+      source: "C:/dev/SmartFill/build/CMakeFiles/CMakeScratch/TryCompile-4du788"
+      binary: "C:/dev/SmartFill/build/CMakeFiles/CMakeScratch/TryCompile-4du788"
+    cmakeVariables:
+      CMAKE_CUDA_ARCHITECTURES: "120"
+      CMAKE_CXX_STDLIB_MODULES_JSON: ""
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
+      CMAKE_C_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_POSITION_INDEPENDENT_CODE: "ON"
+    buildResult:
+      variable: "WEBP_HAVE_FLAG_SSE41"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/dev/SmartFill/build/CMakeFiles/CMakeScratch/TryCompile-4du788'
+        
+        Run Build Command(s): "C:/Program Files (x86)/Microsoft Visual Studio/2019/BuildTools/MSBuild/Current/Bin/MSBuild.exe" cmTC_f2836.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=16.0 /v:n
+        Microsoft (R) Build Engine version 16.11.6+a918ceb31 for .NET Framework
+        Copyright (C) Microsoft Corporation. All rights reserved.
+        
+        Build started 25/05/2026 9:21:27 AM.
+        Project "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-4du788\\cmTC_f2836.vcxproj" on node 1 (default targets).
+        PrepareForBuild:
+          Creating directory "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-4du788\\Debug\\".
+          Creating directory "cmTC_f2836.dir\\Debug\\cmTC_f2836.tlog\\".
+        InitializeBuildStatus:
+          Creating "cmTC_f2836.dir\\Debug\\cmTC_f2836.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+        VcpkgTripletSelection:
+          Using triplet "x64-windows" from "C:\\vcpkg\\installed\\x64-windows\\"
+          Using normalized configuration "Debug"
+        ClCompile:
+          C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Tools\\MSVC\\14.29.30133\\bin\\HostX64\\x64\\CL.exe /c /I"C:\\dev\\SmartFill\\third_party\\stable-diffusion.cpp\\thirdparty\\libwebp" /I"C:\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D WEBP_HAVE_FLAG_SSE41 /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /std:c11 /Fo"cmTC_f2836.dir\\Debug\\\\" /Fd"cmTC_f2836.dir\\Debug\\vc142.pdb" /external:W1 /TC /errorReport:queue "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-4du788\\src.c"
+          Microsoft (R) C/C++ Optimizing Compiler Version 19.29.30159 for x64
+          src.c
+          Copyright (C) Microsoft Corporation.  All rights reserved.
+          cl /c /I"C:\\dev\\SmartFill\\third_party\\stable-diffusion.cpp\\thirdparty\\libwebp" /I"C:\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D WEBP_HAVE_FLAG_SSE41 /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /std:c11 /Fo"cmTC_f2836.dir\\Debug\\\\" /Fd"cmTC_f2836.dir\\Debug\\vc142.pdb" /external:W1 /TC /errorReport:queue "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-4du788\\src.c"
+        Link:
+          C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Tools\\MSVC\\14.29.30133\\bin\\HostX64\\x64\\link.exe /OUT:"C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-4du788\\Debug\\cmTC_f2836.exe" /INCREMENTAL /ILK:"cmTC_f2836.dir\\Debug\\cmTC_f2836.ilk" /NOLOGO /LIBPATH:"C:\\vcpkg\\installed\\x64-windows\\debug\\lib" /LIBPATH:"C:\\vcpkg\\installed\\x64-windows\\debug\\lib\\manual-link" kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib "C:\\vcpkg\\installed\\x64-windows\\debug\\lib\\*.lib" /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/dev/SmartFill/build/CMakeFiles/CMakeScratch/TryCompile-4du788/Debug/cmTC_f2836.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /IMPLIB:"C:/dev/SmartFill/build/CMakeFiles/CMakeScratch/TryCompile-4du788/Debug/cmTC_f2836.lib" /MACHINE:X64  /machine:x64 cmTC_f2836.dir\\Debug\\src.obj
+          cmTC_f2836.vcxproj -> C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-4du788\\Debug\\cmTC_f2836.exe
+        AppLocalFromInstalled:
+          pwsh.exe -ExecutionPolicy Bypass -noprofile -File "C:\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-4du788\\Debug\\cmTC_f2836.exe" "C:\\vcpkg\\installed\\x64-windows\\debug\\bin" "cmTC_f2836.dir\\Debug\\cmTC_f2836.tlog\\cmTC_f2836.write.1u.tlog" "cmTC_f2836.dir\\Debug\\vcpkg.applocal.log"
+          'pwsh.exe' is not recognized as an internal or external command,
+          operable program or batch file.
+          The command "pwsh.exe -ExecutionPolicy Bypass -noprofile -File "C:\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-4du788\\Debug\\cmTC_f2836.exe" "C:\\vcpkg\\installed\\x64-windows\\debug\\bin" "cmTC_f2836.dir\\Debug\\cmTC_f2836.tlog\\cmTC_f2836.write.1u.tlog" "cmTC_f2836.dir\\Debug\\vcpkg.applocal.log"" exited with code 9009.
+          "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -ExecutionPolicy Bypass -noprofile -File "C:\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-4du788\\Debug\\cmTC_f2836.exe" "C:\\vcpkg\\installed\\x64-windows\\debug\\bin" "cmTC_f2836.dir\\Debug\\cmTC_f2836.tlog\\cmTC_f2836.write.1u.tlog" "cmTC_f2836.dir\\Debug\\vcpkg.applocal.log"
+        FinalizeBuildStatus:
+          Deleting file "cmTC_f2836.dir\\Debug\\cmTC_f2836.tlog\\unsuccessfulbuild".
+          Touching "cmTC_f2836.dir\\Debug\\cmTC_f2836.tlog\\cmTC_f2836.lastbuildstate".
+        Done Building Project "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-4du788\\cmTC_f2836.vcxproj" (default targets).
+        
+        Build succeeded.
+            0 Warning(s)
+            0 Error(s)
+        
+        Time Elapsed 00:00:01.61
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/Internal/CheckSourceCompiles.cmake:104 (try_compile)"
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CheckCSourceCompiles.cmake:103 (cmake_check_source_compiles)"
+      - "third_party/stable-diffusion.cpp/thirdparty/libwebp/cmake/cpu.cmake:32 (check_c_source_compiles)"
+      - "third_party/stable-diffusion.cpp/thirdparty/libwebp/cmake/cpu.cmake:117 (webp_check_compiler_flag)"
+      - "third_party/stable-diffusion.cpp/thirdparty/libwebp/cmake/deps.cmake:112 (include)"
+      - "third_party/stable-diffusion.cpp/thirdparty/libwebp/CMakeLists.txt:123 (include)"
+    checks:
+      - "Performing Test WEBP_HAVE_FLAG_SSE2"
+    directories:
+      source: "C:/dev/SmartFill/build/CMakeFiles/CMakeScratch/TryCompile-yqdcdu"
+      binary: "C:/dev/SmartFill/build/CMakeFiles/CMakeScratch/TryCompile-yqdcdu"
+    cmakeVariables:
+      CMAKE_CUDA_ARCHITECTURES: "120"
+      CMAKE_CXX_STDLIB_MODULES_JSON: ""
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
+      CMAKE_C_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_POSITION_INDEPENDENT_CODE: "ON"
+    buildResult:
+      variable: "WEBP_HAVE_FLAG_SSE2"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/dev/SmartFill/build/CMakeFiles/CMakeScratch/TryCompile-yqdcdu'
+        
+        Run Build Command(s): "C:/Program Files (x86)/Microsoft Visual Studio/2019/BuildTools/MSBuild/Current/Bin/MSBuild.exe" cmTC_2fca3.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=16.0 /v:n
+        Microsoft (R) Build Engine version 16.11.6+a918ceb31 for .NET Framework
+        Copyright (C) Microsoft Corporation. All rights reserved.
+        
+        Build started 25/05/2026 9:21:29 AM.
+        Project "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-yqdcdu\\cmTC_2fca3.vcxproj" on node 1 (default targets).
+        PrepareForBuild:
+          Creating directory "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-yqdcdu\\Debug\\".
+          Creating directory "cmTC_2fca3.dir\\Debug\\cmTC_2fca3.tlog\\".
+        InitializeBuildStatus:
+          Creating "cmTC_2fca3.dir\\Debug\\cmTC_2fca3.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+        VcpkgTripletSelection:
+          Using triplet "x64-windows" from "C:\\vcpkg\\installed\\x64-windows\\"
+          Using normalized configuration "Debug"
+        ClCompile:
+          C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Tools\\MSVC\\14.29.30133\\bin\\HostX64\\x64\\CL.exe /c /I"C:\\dev\\SmartFill\\third_party\\stable-diffusion.cpp\\thirdparty\\libwebp" /I"C:\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D WEBP_HAVE_FLAG_SSE2 /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /std:c11 /Fo"cmTC_2fca3.dir\\Debug\\\\" /Fd"cmTC_2fca3.dir\\Debug\\vc142.pdb" /external:W1 /TC /errorReport:queue "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-yqdcdu\\src.c"
+          Microsoft (R) C/C++ Optimizing Compiler Version 19.29.30159 for x64
+          src.c
+          Copyright (C) Microsoft Corporation.  All rights reserved.
+          cl /c /I"C:\\dev\\SmartFill\\third_party\\stable-diffusion.cpp\\thirdparty\\libwebp" /I"C:\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D WEBP_HAVE_FLAG_SSE2 /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /std:c11 /Fo"cmTC_2fca3.dir\\Debug\\\\" /Fd"cmTC_2fca3.dir\\Debug\\vc142.pdb" /external:W1 /TC /errorReport:queue "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-yqdcdu\\src.c"
+        Link:
+          C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Tools\\MSVC\\14.29.30133\\bin\\HostX64\\x64\\link.exe /OUT:"C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-yqdcdu\\Debug\\cmTC_2fca3.exe" /INCREMENTAL /ILK:"cmTC_2fca3.dir\\Debug\\cmTC_2fca3.ilk" /NOLOGO /LIBPATH:"C:\\vcpkg\\installed\\x64-windows\\debug\\lib" /LIBPATH:"C:\\vcpkg\\installed\\x64-windows\\debug\\lib\\manual-link" kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib "C:\\vcpkg\\installed\\x64-windows\\debug\\lib\\*.lib" /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/dev/SmartFill/build/CMakeFiles/CMakeScratch/TryCompile-yqdcdu/Debug/cmTC_2fca3.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /IMPLIB:"C:/dev/SmartFill/build/CMakeFiles/CMakeScratch/TryCompile-yqdcdu/Debug/cmTC_2fca3.lib" /MACHINE:X64  /machine:x64 cmTC_2fca3.dir\\Debug\\src.obj
+          cmTC_2fca3.vcxproj -> C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-yqdcdu\\Debug\\cmTC_2fca3.exe
+        AppLocalFromInstalled:
+          pwsh.exe -ExecutionPolicy Bypass -noprofile -File "C:\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-yqdcdu\\Debug\\cmTC_2fca3.exe" "C:\\vcpkg\\installed\\x64-windows\\debug\\bin" "cmTC_2fca3.dir\\Debug\\cmTC_2fca3.tlog\\cmTC_2fca3.write.1u.tlog" "cmTC_2fca3.dir\\Debug\\vcpkg.applocal.log"
+          'pwsh.exe' is not recognized as an internal or external command,
+          operable program or batch file.
+          The command "pwsh.exe -ExecutionPolicy Bypass -noprofile -File "C:\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-yqdcdu\\Debug\\cmTC_2fca3.exe" "C:\\vcpkg\\installed\\x64-windows\\debug\\bin" "cmTC_2fca3.dir\\Debug\\cmTC_2fca3.tlog\\cmTC_2fca3.write.1u.tlog" "cmTC_2fca3.dir\\Debug\\vcpkg.applocal.log"" exited with code 9009.
+          "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -ExecutionPolicy Bypass -noprofile -File "C:\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-yqdcdu\\Debug\\cmTC_2fca3.exe" "C:\\vcpkg\\installed\\x64-windows\\debug\\bin" "cmTC_2fca3.dir\\Debug\\cmTC_2fca3.tlog\\cmTC_2fca3.write.1u.tlog" "cmTC_2fca3.dir\\Debug\\vcpkg.applocal.log"
+        FinalizeBuildStatus:
+          Deleting file "cmTC_2fca3.dir\\Debug\\cmTC_2fca3.tlog\\unsuccessfulbuild".
+          Touching "cmTC_2fca3.dir\\Debug\\cmTC_2fca3.tlog\\cmTC_2fca3.lastbuildstate".
+        Done Building Project "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-yqdcdu\\cmTC_2fca3.vcxproj" (default targets).
+        
+        Build succeeded.
+            0 Warning(s)
+            0 Error(s)
+        
+        Time Elapsed 00:00:01.58
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/Internal/CheckSourceCompiles.cmake:104 (try_compile)"
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CheckCSourceCompiles.cmake:103 (cmake_check_source_compiles)"
+      - "third_party/stable-diffusion.cpp/thirdparty/libwebp/cmake/cpu.cmake:32 (check_c_source_compiles)"
+      - "third_party/stable-diffusion.cpp/thirdparty/libwebp/cmake/cpu.cmake:117 (webp_check_compiler_flag)"
+      - "third_party/stable-diffusion.cpp/thirdparty/libwebp/cmake/deps.cmake:112 (include)"
+      - "third_party/stable-diffusion.cpp/thirdparty/libwebp/CMakeLists.txt:123 (include)"
+    checks:
+      - "Performing Test WEBP_HAVE_FLAG_MIPS32"
+    directories:
+      source: "C:/dev/SmartFill/build/CMakeFiles/CMakeScratch/TryCompile-mm4tlo"
+      binary: "C:/dev/SmartFill/build/CMakeFiles/CMakeScratch/TryCompile-mm4tlo"
+    cmakeVariables:
+      CMAKE_CUDA_ARCHITECTURES: "120"
+      CMAKE_CXX_STDLIB_MODULES_JSON: ""
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
+      CMAKE_C_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_POSITION_INDEPENDENT_CODE: "ON"
+    buildResult:
+      variable: "WEBP_HAVE_FLAG_MIPS32"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/dev/SmartFill/build/CMakeFiles/CMakeScratch/TryCompile-mm4tlo'
+        
+        Run Build Command(s): "C:/Program Files (x86)/Microsoft Visual Studio/2019/BuildTools/MSBuild/Current/Bin/MSBuild.exe" cmTC_42e5d.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=16.0 /v:n
+        Microsoft (R) Build Engine version 16.11.6+a918ceb31 for .NET Framework
+        Copyright (C) Microsoft Corporation. All rights reserved.
+        
+        Build started 25/05/2026 9:21:31 AM.
+        Project "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mm4tlo\\cmTC_42e5d.vcxproj" on node 1 (default targets).
+        PrepareForBuild:
+          Creating directory "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mm4tlo\\Debug\\".
+          Creating directory "cmTC_42e5d.dir\\Debug\\cmTC_42e5d.tlog\\".
+        InitializeBuildStatus:
+          Creating "cmTC_42e5d.dir\\Debug\\cmTC_42e5d.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+        VcpkgTripletSelection:
+          Using triplet "x64-windows" from "C:\\vcpkg\\installed\\x64-windows\\"
+          Using normalized configuration "Debug"
+        ClCompile:
+          C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Tools\\MSVC\\14.29.30133\\bin\\HostX64\\x64\\CL.exe /c /I"C:\\dev\\SmartFill\\third_party\\stable-diffusion.cpp\\thirdparty\\libwebp" /I"C:\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D WEBP_HAVE_FLAG_MIPS32 /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /std:c11 /Fo"cmTC_42e5d.dir\\Debug\\\\" /Fd"cmTC_42e5d.dir\\Debug\\vc142.pdb" /external:W1 /TC /errorReport:queue "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mm4tlo\\src.c"
+          Microsoft (R) C/C++ Optimizing Compiler Version 19.29.30159 for x64
+          src.c
+          Copyright (C) Microsoft Corporation.  All rights reserved.
+          cl /c /I"C:\\dev\\SmartFill\\third_party\\stable-diffusion.cpp\\thirdparty\\libwebp" /I"C:\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D WEBP_HAVE_FLAG_MIPS32 /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /std:c11 /Fo"cmTC_42e5d.dir\\Debug\\\\" /Fd"cmTC_42e5d.dir\\Debug\\vc142.pdb" /external:W1 /TC /errorReport:queue "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mm4tlo\\src.c"
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mm4tlo\\src.c(19,14): error C2065: 'this': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mm4tlo\\cmTC_42e5d.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mm4tlo\\src.c(19,14): error C2146: syntax error: missing ';' before identifier 'is' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mm4tlo\\cmTC_42e5d.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mm4tlo\\src.c(19,17): error C2065: 'is': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mm4tlo\\cmTC_42e5d.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mm4tlo\\src.c(19,17): error C2146: syntax error: missing ';' before identifier 'not' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mm4tlo\\cmTC_42e5d.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mm4tlo\\src.c(19,21): error C2065: 'not': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mm4tlo\\cmTC_42e5d.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mm4tlo\\src.c(19,21): error C2146: syntax error: missing ';' before identifier 'valid' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mm4tlo\\cmTC_42e5d.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mm4tlo\\src.c(19,27): error C2065: 'valid': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mm4tlo\\cmTC_42e5d.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mm4tlo\\src.c(19,27): error C2146: syntax error: missing ';' before identifier 'code' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mm4tlo\\cmTC_42e5d.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mm4tlo\\src.c(21,9): error C2065: 'code': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mm4tlo\\cmTC_42e5d.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mm4tlo\\src.c(21,9): error C2143: syntax error: missing ';' before 'return' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mm4tlo\\cmTC_42e5d.vcxproj]
+        Done Building Project "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mm4tlo\\cmTC_42e5d.vcxproj" (default targets) -- FAILED.
+        
+        Build FAILED.
+        
+        "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mm4tlo\\cmTC_42e5d.vcxproj" (default target) (1) ->
+        (ClCompile target) -> 
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mm4tlo\\src.c(19,14): error C2065: 'this': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mm4tlo\\cmTC_42e5d.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mm4tlo\\src.c(19,14): error C2146: syntax error: missing ';' before identifier 'is' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mm4tlo\\cmTC_42e5d.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mm4tlo\\src.c(19,17): error C2065: 'is': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mm4tlo\\cmTC_42e5d.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mm4tlo\\src.c(19,17): error C2146: syntax error: missing ';' before identifier 'not' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mm4tlo\\cmTC_42e5d.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mm4tlo\\src.c(19,21): error C2065: 'not': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mm4tlo\\cmTC_42e5d.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mm4tlo\\src.c(19,21): error C2146: syntax error: missing ';' before identifier 'valid' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mm4tlo\\cmTC_42e5d.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mm4tlo\\src.c(19,27): error C2065: 'valid': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mm4tlo\\cmTC_42e5d.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mm4tlo\\src.c(19,27): error C2146: syntax error: missing ';' before identifier 'code' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mm4tlo\\cmTC_42e5d.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mm4tlo\\src.c(21,9): error C2065: 'code': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mm4tlo\\cmTC_42e5d.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mm4tlo\\src.c(21,9): error C2143: syntax error: missing ';' before 'return' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mm4tlo\\cmTC_42e5d.vcxproj]
+        
+            0 Warning(s)
+            10 Error(s)
+        
+        Time Elapsed 00:00:00.41
+        
+      exitCode: 1
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/Internal/CheckSourceCompiles.cmake:104 (try_compile)"
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CheckCSourceCompiles.cmake:103 (cmake_check_source_compiles)"
+      - "third_party/stable-diffusion.cpp/thirdparty/libwebp/cmake/cpu.cmake:32 (check_c_source_compiles)"
+      - "third_party/stable-diffusion.cpp/thirdparty/libwebp/cmake/cpu.cmake:124 (webp_check_compiler_flag)"
+      - "third_party/stable-diffusion.cpp/thirdparty/libwebp/cmake/deps.cmake:112 (include)"
+      - "third_party/stable-diffusion.cpp/thirdparty/libwebp/CMakeLists.txt:123 (include)"
+    checks:
+      - "Performing Test WEBP_HAVE_FLAG_MIPS32"
+    directories:
+      source: "C:/dev/SmartFill/build/CMakeFiles/CMakeScratch/TryCompile-oq4y4m"
+      binary: "C:/dev/SmartFill/build/CMakeFiles/CMakeScratch/TryCompile-oq4y4m"
+    cmakeVariables:
+      CMAKE_CUDA_ARCHITECTURES: "120"
+      CMAKE_CXX_STDLIB_MODULES_JSON: ""
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
+      CMAKE_C_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_POSITION_INDEPENDENT_CODE: "ON"
+    buildResult:
+      variable: "WEBP_HAVE_FLAG_MIPS32"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/dev/SmartFill/build/CMakeFiles/CMakeScratch/TryCompile-oq4y4m'
+        
+        Run Build Command(s): "C:/Program Files (x86)/Microsoft Visual Studio/2019/BuildTools/MSBuild/Current/Bin/MSBuild.exe" cmTC_b9fa2.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=16.0 /v:n
+        Microsoft (R) Build Engine version 16.11.6+a918ceb31 for .NET Framework
+        Copyright (C) Microsoft Corporation. All rights reserved.
+        
+        Build started 25/05/2026 9:21:32 AM.
+        Project "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oq4y4m\\cmTC_b9fa2.vcxproj" on node 1 (default targets).
+        PrepareForBuild:
+          Creating directory "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oq4y4m\\Debug\\".
+          Creating directory "cmTC_b9fa2.dir\\Debug\\cmTC_b9fa2.tlog\\".
+        InitializeBuildStatus:
+          Creating "cmTC_b9fa2.dir\\Debug\\cmTC_b9fa2.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+        VcpkgTripletSelection:
+          Using triplet "x64-windows" from "C:\\vcpkg\\installed\\x64-windows\\"
+          Using normalized configuration "Debug"
+        ClCompile:
+          C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Tools\\MSVC\\14.29.30133\\bin\\HostX64\\x64\\CL.exe /c /I"C:\\dev\\SmartFill\\third_party\\stable-diffusion.cpp\\thirdparty\\libwebp" /I"C:\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D WEBP_HAVE_FLAG_MIPS32 /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /std:c11 /Fo"cmTC_b9fa2.dir\\Debug\\\\" /Fd"cmTC_b9fa2.dir\\Debug\\vc142.pdb" /external:W1 /TC /errorReport:queue  NOTFOUND "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oq4y4m\\src.c"
+          Microsoft (R) C/C++ Optimizing Compiler Version 19.29.30159 for x64
+          NOTFOUND
+          Copyright (C) Microsoft Corporation.  All rights reserved.
+          cl /c /I"C:\\dev\\SmartFill\\third_party\\stable-diffusion.cpp\\thirdparty\\libwebp" /I"C:\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D WEBP_HAVE_FLAG_MIPS32 /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /std:c11 /Fo"cmTC_b9fa2.dir\\Debug\\\\" /Fd"cmTC_b9fa2.dir\\Debug\\vc142.pdb" /external:W1 /TC /errorReport:queue  NOTFOUND "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oq4y4m\\src.c"
+        c1 : fatal error C1083: Cannot open source file: 'NOTFOUND': No such file or directory [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oq4y4m\\cmTC_b9fa2.vcxproj]
+          src.c
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oq4y4m\\src.c(19,14): error C2065: 'this': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oq4y4m\\cmTC_b9fa2.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oq4y4m\\src.c(19,14): error C2146: syntax error: missing ';' before identifier 'is' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oq4y4m\\cmTC_b9fa2.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oq4y4m\\src.c(19,17): error C2065: 'is': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oq4y4m\\cmTC_b9fa2.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oq4y4m\\src.c(19,17): error C2146: syntax error: missing ';' before identifier 'not' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oq4y4m\\cmTC_b9fa2.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oq4y4m\\src.c(19,21): error C2065: 'not': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oq4y4m\\cmTC_b9fa2.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oq4y4m\\src.c(19,21): error C2146: syntax error: missing ';' before identifier 'valid' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oq4y4m\\cmTC_b9fa2.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oq4y4m\\src.c(19,27): error C2065: 'valid': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oq4y4m\\cmTC_b9fa2.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oq4y4m\\src.c(19,27): error C2146: syntax error: missing ';' before identifier 'code' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oq4y4m\\cmTC_b9fa2.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oq4y4m\\src.c(21,9): error C2065: 'code': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oq4y4m\\cmTC_b9fa2.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oq4y4m\\src.c(21,9): error C2143: syntax error: missing ';' before 'return' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oq4y4m\\cmTC_b9fa2.vcxproj]
+          Generating Code...
+        Done Building Project "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oq4y4m\\cmTC_b9fa2.vcxproj" (default targets) -- FAILED.
+        
+        Build FAILED.
+        
+        "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oq4y4m\\cmTC_b9fa2.vcxproj" (default target) (1) ->
+        (ClCompile target) -> 
+          c1 : fatal error C1083: Cannot open source file: 'NOTFOUND': No such file or directory [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oq4y4m\\cmTC_b9fa2.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oq4y4m\\src.c(19,14): error C2065: 'this': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oq4y4m\\cmTC_b9fa2.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oq4y4m\\src.c(19,14): error C2146: syntax error: missing ';' before identifier 'is' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oq4y4m\\cmTC_b9fa2.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oq4y4m\\src.c(19,17): error C2065: 'is': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oq4y4m\\cmTC_b9fa2.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oq4y4m\\src.c(19,17): error C2146: syntax error: missing ';' before identifier 'not' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oq4y4m\\cmTC_b9fa2.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oq4y4m\\src.c(19,21): error C2065: 'not': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oq4y4m\\cmTC_b9fa2.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oq4y4m\\src.c(19,21): error C2146: syntax error: missing ';' before identifier 'valid' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oq4y4m\\cmTC_b9fa2.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oq4y4m\\src.c(19,27): error C2065: 'valid': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oq4y4m\\cmTC_b9fa2.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oq4y4m\\src.c(19,27): error C2146: syntax error: missing ';' before identifier 'code' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oq4y4m\\cmTC_b9fa2.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oq4y4m\\src.c(21,9): error C2065: 'code': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oq4y4m\\cmTC_b9fa2.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oq4y4m\\src.c(21,9): error C2143: syntax error: missing ';' before 'return' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oq4y4m\\cmTC_b9fa2.vcxproj]
+        
+            0 Warning(s)
+            11 Error(s)
+        
+        Time Elapsed 00:00:00.41
+        
+      exitCode: 1
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/Internal/CheckSourceCompiles.cmake:104 (try_compile)"
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CheckCSourceCompiles.cmake:103 (cmake_check_source_compiles)"
+      - "third_party/stable-diffusion.cpp/thirdparty/libwebp/cmake/cpu.cmake:32 (check_c_source_compiles)"
+      - "third_party/stable-diffusion.cpp/thirdparty/libwebp/cmake/cpu.cmake:117 (webp_check_compiler_flag)"
+      - "third_party/stable-diffusion.cpp/thirdparty/libwebp/cmake/deps.cmake:112 (include)"
+      - "third_party/stable-diffusion.cpp/thirdparty/libwebp/CMakeLists.txt:123 (include)"
+    checks:
+      - "Performing Test WEBP_HAVE_FLAG_MIPS_DSP_R2"
+    directories:
+      source: "C:/dev/SmartFill/build/CMakeFiles/CMakeScratch/TryCompile-xkji9y"
+      binary: "C:/dev/SmartFill/build/CMakeFiles/CMakeScratch/TryCompile-xkji9y"
+    cmakeVariables:
+      CMAKE_CUDA_ARCHITECTURES: "120"
+      CMAKE_CXX_STDLIB_MODULES_JSON: ""
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
+      CMAKE_C_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_POSITION_INDEPENDENT_CODE: "ON"
+    buildResult:
+      variable: "WEBP_HAVE_FLAG_MIPS_DSP_R2"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/dev/SmartFill/build/CMakeFiles/CMakeScratch/TryCompile-xkji9y'
+        
+        Run Build Command(s): "C:/Program Files (x86)/Microsoft Visual Studio/2019/BuildTools/MSBuild/Current/Bin/MSBuild.exe" cmTC_dd44c.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=16.0 /v:n
+        Microsoft (R) Build Engine version 16.11.6+a918ceb31 for .NET Framework
+        Copyright (C) Microsoft Corporation. All rights reserved.
+        
+        Build started 25/05/2026 9:21:32 AM.
+        Project "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-xkji9y\\cmTC_dd44c.vcxproj" on node 1 (default targets).
+        PrepareForBuild:
+          Creating directory "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-xkji9y\\Debug\\".
+          Creating directory "cmTC_dd44c.dir\\Debug\\cmTC_dd44c.tlog\\".
+        InitializeBuildStatus:
+          Creating "cmTC_dd44c.dir\\Debug\\cmTC_dd44c.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+        VcpkgTripletSelection:
+          Using triplet "x64-windows" from "C:\\vcpkg\\installed\\x64-windows\\"
+          Using normalized configuration "Debug"
+        ClCompile:
+          C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Tools\\MSVC\\14.29.30133\\bin\\HostX64\\x64\\CL.exe /c /I"C:\\dev\\SmartFill\\third_party\\stable-diffusion.cpp\\thirdparty\\libwebp" /I"C:\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D WEBP_HAVE_FLAG_MIPS_DSP_R2 /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /std:c11 /Fo"cmTC_dd44c.dir\\Debug\\\\" /Fd"cmTC_dd44c.dir\\Debug\\vc142.pdb" /external:W1 /TC /errorReport:queue "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-xkji9y\\src.c"
+          Microsoft (R) C/C++ Optimizing Compiler Version 19.29.30159 for x64
+          src.c
+          Copyright (C) Microsoft Corporation.  All rights reserved.
+          cl /c /I"C:\\dev\\SmartFill\\third_party\\stable-diffusion.cpp\\thirdparty\\libwebp" /I"C:\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D WEBP_HAVE_FLAG_MIPS_DSP_R2 /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /std:c11 /Fo"cmTC_dd44c.dir\\Debug\\\\" /Fd"cmTC_dd44c.dir\\Debug\\vc142.pdb" /external:W1 /TC /errorReport:queue "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-xkji9y\\src.c"
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-xkji9y\\src.c(19,14): error C2065: 'this': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-xkji9y\\cmTC_dd44c.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-xkji9y\\src.c(19,14): error C2146: syntax error: missing ';' before identifier 'is' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-xkji9y\\cmTC_dd44c.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-xkji9y\\src.c(19,17): error C2065: 'is': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-xkji9y\\cmTC_dd44c.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-xkji9y\\src.c(19,17): error C2146: syntax error: missing ';' before identifier 'not' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-xkji9y\\cmTC_dd44c.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-xkji9y\\src.c(19,21): error C2065: 'not': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-xkji9y\\cmTC_dd44c.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-xkji9y\\src.c(19,21): error C2146: syntax error: missing ';' before identifier 'valid' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-xkji9y\\cmTC_dd44c.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-xkji9y\\src.c(19,27): error C2065: 'valid': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-xkji9y\\cmTC_dd44c.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-xkji9y\\src.c(19,27): error C2146: syntax error: missing ';' before identifier 'code' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-xkji9y\\cmTC_dd44c.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-xkji9y\\src.c(21,9): error C2065: 'code': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-xkji9y\\cmTC_dd44c.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-xkji9y\\src.c(21,9): error C2143: syntax error: missing ';' before 'return' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-xkji9y\\cmTC_dd44c.vcxproj]
+        Done Building Project "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-xkji9y\\cmTC_dd44c.vcxproj" (default targets) -- FAILED.
+        
+        Build FAILED.
+        
+        "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-xkji9y\\cmTC_dd44c.vcxproj" (default target) (1) ->
+        (ClCompile target) -> 
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-xkji9y\\src.c(19,14): error C2065: 'this': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-xkji9y\\cmTC_dd44c.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-xkji9y\\src.c(19,14): error C2146: syntax error: missing ';' before identifier 'is' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-xkji9y\\cmTC_dd44c.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-xkji9y\\src.c(19,17): error C2065: 'is': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-xkji9y\\cmTC_dd44c.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-xkji9y\\src.c(19,17): error C2146: syntax error: missing ';' before identifier 'not' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-xkji9y\\cmTC_dd44c.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-xkji9y\\src.c(19,21): error C2065: 'not': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-xkji9y\\cmTC_dd44c.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-xkji9y\\src.c(19,21): error C2146: syntax error: missing ';' before identifier 'valid' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-xkji9y\\cmTC_dd44c.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-xkji9y\\src.c(19,27): error C2065: 'valid': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-xkji9y\\cmTC_dd44c.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-xkji9y\\src.c(19,27): error C2146: syntax error: missing ';' before identifier 'code' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-xkji9y\\cmTC_dd44c.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-xkji9y\\src.c(21,9): error C2065: 'code': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-xkji9y\\cmTC_dd44c.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-xkji9y\\src.c(21,9): error C2143: syntax error: missing ';' before 'return' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-xkji9y\\cmTC_dd44c.vcxproj]
+        
+            0 Warning(s)
+            10 Error(s)
+        
+        Time Elapsed 00:00:00.41
+        
+      exitCode: 1
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/Internal/CheckSourceCompiles.cmake:104 (try_compile)"
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CheckCSourceCompiles.cmake:103 (cmake_check_source_compiles)"
+      - "third_party/stable-diffusion.cpp/thirdparty/libwebp/cmake/cpu.cmake:32 (check_c_source_compiles)"
+      - "third_party/stable-diffusion.cpp/thirdparty/libwebp/cmake/cpu.cmake:124 (webp_check_compiler_flag)"
+      - "third_party/stable-diffusion.cpp/thirdparty/libwebp/cmake/deps.cmake:112 (include)"
+      - "third_party/stable-diffusion.cpp/thirdparty/libwebp/CMakeLists.txt:123 (include)"
+    checks:
+      - "Performing Test WEBP_HAVE_FLAG_MIPS_DSP_R2"
+    directories:
+      source: "C:/dev/SmartFill/build/CMakeFiles/CMakeScratch/TryCompile-oaqgcj"
+      binary: "C:/dev/SmartFill/build/CMakeFiles/CMakeScratch/TryCompile-oaqgcj"
+    cmakeVariables:
+      CMAKE_CUDA_ARCHITECTURES: "120"
+      CMAKE_CXX_STDLIB_MODULES_JSON: ""
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
+      CMAKE_C_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_POSITION_INDEPENDENT_CODE: "ON"
+    buildResult:
+      variable: "WEBP_HAVE_FLAG_MIPS_DSP_R2"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/dev/SmartFill/build/CMakeFiles/CMakeScratch/TryCompile-oaqgcj'
+        
+        Run Build Command(s): "C:/Program Files (x86)/Microsoft Visual Studio/2019/BuildTools/MSBuild/Current/Bin/MSBuild.exe" cmTC_ce616.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=16.0 /v:n
+        Microsoft (R) Build Engine version 16.11.6+a918ceb31 for .NET Framework
+        Copyright (C) Microsoft Corporation. All rights reserved.
+        
+        Build started 25/05/2026 9:21:33 AM.
+        Project "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oaqgcj\\cmTC_ce616.vcxproj" on node 1 (default targets).
+        PrepareForBuild:
+          Creating directory "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oaqgcj\\Debug\\".
+          Creating directory "cmTC_ce616.dir\\Debug\\cmTC_ce616.tlog\\".
+        InitializeBuildStatus:
+          Creating "cmTC_ce616.dir\\Debug\\cmTC_ce616.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+        VcpkgTripletSelection:
+          Using triplet "x64-windows" from "C:\\vcpkg\\installed\\x64-windows\\"
+          Using normalized configuration "Debug"
+        ClCompile:
+          C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Tools\\MSVC\\14.29.30133\\bin\\HostX64\\x64\\CL.exe /c /I"C:\\dev\\SmartFill\\third_party\\stable-diffusion.cpp\\thirdparty\\libwebp" /I"C:\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D WEBP_HAVE_FLAG_MIPS_DSP_R2 /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /std:c11 /Fo"cmTC_ce616.dir\\Debug\\\\" /Fd"cmTC_ce616.dir\\Debug\\vc142.pdb" /external:W1 /TC /errorReport:queue  NOTFOUND "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oaqgcj\\src.c"
+          Microsoft (R) C/C++ Optimizing Compiler Version 19.29.30159 for x64
+          NOTFOUND
+          Copyright (C) Microsoft Corporation.  All rights reserved.
+          cl /c /I"C:\\dev\\SmartFill\\third_party\\stable-diffusion.cpp\\thirdparty\\libwebp" /I"C:\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D WEBP_HAVE_FLAG_MIPS_DSP_R2 /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /std:c11 /Fo"cmTC_ce616.dir\\Debug\\\\" /Fd"cmTC_ce616.dir\\Debug\\vc142.pdb" /external:W1 /TC /errorReport:queue  NOTFOUND "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oaqgcj\\src.c"
+        c1 : fatal error C1083: Cannot open source file: 'NOTFOUND': No such file or directory [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oaqgcj\\cmTC_ce616.vcxproj]
+          src.c
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oaqgcj\\src.c(19,14): error C2065: 'this': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oaqgcj\\cmTC_ce616.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oaqgcj\\src.c(19,14): error C2146: syntax error: missing ';' before identifier 'is' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oaqgcj\\cmTC_ce616.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oaqgcj\\src.c(19,17): error C2065: 'is': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oaqgcj\\cmTC_ce616.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oaqgcj\\src.c(19,17): error C2146: syntax error: missing ';' before identifier 'not' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oaqgcj\\cmTC_ce616.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oaqgcj\\src.c(19,21): error C2065: 'not': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oaqgcj\\cmTC_ce616.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oaqgcj\\src.c(19,21): error C2146: syntax error: missing ';' before identifier 'valid' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oaqgcj\\cmTC_ce616.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oaqgcj\\src.c(19,27): error C2065: 'valid': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oaqgcj\\cmTC_ce616.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oaqgcj\\src.c(19,27): error C2146: syntax error: missing ';' before identifier 'code' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oaqgcj\\cmTC_ce616.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oaqgcj\\src.c(21,9): error C2065: 'code': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oaqgcj\\cmTC_ce616.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oaqgcj\\src.c(21,9): error C2143: syntax error: missing ';' before 'return' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oaqgcj\\cmTC_ce616.vcxproj]
+          Generating Code...
+        Done Building Project "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oaqgcj\\cmTC_ce616.vcxproj" (default targets) -- FAILED.
+        
+        Build FAILED.
+        
+        "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oaqgcj\\cmTC_ce616.vcxproj" (default target) (1) ->
+        (ClCompile target) -> 
+          c1 : fatal error C1083: Cannot open source file: 'NOTFOUND': No such file or directory [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oaqgcj\\cmTC_ce616.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oaqgcj\\src.c(19,14): error C2065: 'this': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oaqgcj\\cmTC_ce616.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oaqgcj\\src.c(19,14): error C2146: syntax error: missing ';' before identifier 'is' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oaqgcj\\cmTC_ce616.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oaqgcj\\src.c(19,17): error C2065: 'is': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oaqgcj\\cmTC_ce616.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oaqgcj\\src.c(19,17): error C2146: syntax error: missing ';' before identifier 'not' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oaqgcj\\cmTC_ce616.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oaqgcj\\src.c(19,21): error C2065: 'not': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oaqgcj\\cmTC_ce616.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oaqgcj\\src.c(19,21): error C2146: syntax error: missing ';' before identifier 'valid' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oaqgcj\\cmTC_ce616.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oaqgcj\\src.c(19,27): error C2065: 'valid': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oaqgcj\\cmTC_ce616.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oaqgcj\\src.c(19,27): error C2146: syntax error: missing ';' before identifier 'code' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oaqgcj\\cmTC_ce616.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oaqgcj\\src.c(21,9): error C2065: 'code': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oaqgcj\\cmTC_ce616.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oaqgcj\\src.c(21,9): error C2143: syntax error: missing ';' before 'return' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-oaqgcj\\cmTC_ce616.vcxproj]
+        
+            0 Warning(s)
+            11 Error(s)
+        
+        Time Elapsed 00:00:00.43
+        
+      exitCode: 1
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/Internal/CheckSourceCompiles.cmake:104 (try_compile)"
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CheckCSourceCompiles.cmake:103 (cmake_check_source_compiles)"
+      - "third_party/stable-diffusion.cpp/thirdparty/libwebp/cmake/cpu.cmake:32 (check_c_source_compiles)"
+      - "third_party/stable-diffusion.cpp/thirdparty/libwebp/cmake/cpu.cmake:117 (webp_check_compiler_flag)"
+      - "third_party/stable-diffusion.cpp/thirdparty/libwebp/cmake/deps.cmake:112 (include)"
+      - "third_party/stable-diffusion.cpp/thirdparty/libwebp/CMakeLists.txt:123 (include)"
+    checks:
+      - "Performing Test WEBP_HAVE_FLAG_NEON"
+    directories:
+      source: "C:/dev/SmartFill/build/CMakeFiles/CMakeScratch/TryCompile-h2su1w"
+      binary: "C:/dev/SmartFill/build/CMakeFiles/CMakeScratch/TryCompile-h2su1w"
+    cmakeVariables:
+      CMAKE_CUDA_ARCHITECTURES: "120"
+      CMAKE_CXX_STDLIB_MODULES_JSON: ""
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
+      CMAKE_C_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_POSITION_INDEPENDENT_CODE: "ON"
+    buildResult:
+      variable: "WEBP_HAVE_FLAG_NEON"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/dev/SmartFill/build/CMakeFiles/CMakeScratch/TryCompile-h2su1w'
+        
+        Run Build Command(s): "C:/Program Files (x86)/Microsoft Visual Studio/2019/BuildTools/MSBuild/Current/Bin/MSBuild.exe" cmTC_24033.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=16.0 /v:n
+        Microsoft (R) Build Engine version 16.11.6+a918ceb31 for .NET Framework
+        Copyright (C) Microsoft Corporation. All rights reserved.
+        
+        Build started 25/05/2026 9:21:34 AM.
+        Project "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-h2su1w\\cmTC_24033.vcxproj" on node 1 (default targets).
+        PrepareForBuild:
+          Creating directory "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-h2su1w\\Debug\\".
+          Creating directory "cmTC_24033.dir\\Debug\\cmTC_24033.tlog\\".
+        InitializeBuildStatus:
+          Creating "cmTC_24033.dir\\Debug\\cmTC_24033.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+        VcpkgTripletSelection:
+          Using triplet "x64-windows" from "C:\\vcpkg\\installed\\x64-windows\\"
+          Using normalized configuration "Debug"
+        ClCompile:
+          C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Tools\\MSVC\\14.29.30133\\bin\\HostX64\\x64\\CL.exe /c /I"C:\\dev\\SmartFill\\third_party\\stable-diffusion.cpp\\thirdparty\\libwebp" /I"C:\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D WEBP_HAVE_FLAG_NEON /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /std:c11 /Fo"cmTC_24033.dir\\Debug\\\\" /Fd"cmTC_24033.dir\\Debug\\vc142.pdb" /external:W1 /TC /errorReport:queue "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-h2su1w\\src.c"
+          Microsoft (R) C/C++ Optimizing Compiler Version 19.29.30159 for x64
+          src.c
+          Copyright (C) Microsoft Corporation.  All rights reserved.
+          cl /c /I"C:\\dev\\SmartFill\\third_party\\stable-diffusion.cpp\\thirdparty\\libwebp" /I"C:\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D WEBP_HAVE_FLAG_NEON /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /std:c11 /Fo"cmTC_24033.dir\\Debug\\\\" /Fd"cmTC_24033.dir\\Debug\\vc142.pdb" /external:W1 /TC /errorReport:queue "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-h2su1w\\src.c"
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-h2su1w\\src.c(19,14): error C2065: 'this': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-h2su1w\\cmTC_24033.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-h2su1w\\src.c(19,14): error C2146: syntax error: missing ';' before identifier 'is' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-h2su1w\\cmTC_24033.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-h2su1w\\src.c(19,17): error C2065: 'is': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-h2su1w\\cmTC_24033.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-h2su1w\\src.c(19,17): error C2146: syntax error: missing ';' before identifier 'not' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-h2su1w\\cmTC_24033.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-h2su1w\\src.c(19,21): error C2065: 'not': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-h2su1w\\cmTC_24033.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-h2su1w\\src.c(19,21): error C2146: syntax error: missing ';' before identifier 'valid' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-h2su1w\\cmTC_24033.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-h2su1w\\src.c(19,27): error C2065: 'valid': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-h2su1w\\cmTC_24033.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-h2su1w\\src.c(19,27): error C2146: syntax error: missing ';' before identifier 'code' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-h2su1w\\cmTC_24033.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-h2su1w\\src.c(21,9): error C2065: 'code': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-h2su1w\\cmTC_24033.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-h2su1w\\src.c(21,9): error C2143: syntax error: missing ';' before 'return' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-h2su1w\\cmTC_24033.vcxproj]
+        Done Building Project "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-h2su1w\\cmTC_24033.vcxproj" (default targets) -- FAILED.
+        
+        Build FAILED.
+        
+        "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-h2su1w\\cmTC_24033.vcxproj" (default target) (1) ->
+        (ClCompile target) -> 
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-h2su1w\\src.c(19,14): error C2065: 'this': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-h2su1w\\cmTC_24033.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-h2su1w\\src.c(19,14): error C2146: syntax error: missing ';' before identifier 'is' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-h2su1w\\cmTC_24033.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-h2su1w\\src.c(19,17): error C2065: 'is': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-h2su1w\\cmTC_24033.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-h2su1w\\src.c(19,17): error C2146: syntax error: missing ';' before identifier 'not' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-h2su1w\\cmTC_24033.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-h2su1w\\src.c(19,21): error C2065: 'not': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-h2su1w\\cmTC_24033.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-h2su1w\\src.c(19,21): error C2146: syntax error: missing ';' before identifier 'valid' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-h2su1w\\cmTC_24033.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-h2su1w\\src.c(19,27): error C2065: 'valid': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-h2su1w\\cmTC_24033.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-h2su1w\\src.c(19,27): error C2146: syntax error: missing ';' before identifier 'code' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-h2su1w\\cmTC_24033.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-h2su1w\\src.c(21,9): error C2065: 'code': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-h2su1w\\cmTC_24033.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-h2su1w\\src.c(21,9): error C2143: syntax error: missing ';' before 'return' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-h2su1w\\cmTC_24033.vcxproj]
+        
+            0 Warning(s)
+            10 Error(s)
+        
+        Time Elapsed 00:00:00.40
+        
+      exitCode: 1
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/Internal/CheckSourceCompiles.cmake:104 (try_compile)"
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CheckCSourceCompiles.cmake:103 (cmake_check_source_compiles)"
+      - "third_party/stable-diffusion.cpp/thirdparty/libwebp/cmake/cpu.cmake:32 (check_c_source_compiles)"
+      - "third_party/stable-diffusion.cpp/thirdparty/libwebp/cmake/cpu.cmake:124 (webp_check_compiler_flag)"
+      - "third_party/stable-diffusion.cpp/thirdparty/libwebp/cmake/deps.cmake:112 (include)"
+      - "third_party/stable-diffusion.cpp/thirdparty/libwebp/CMakeLists.txt:123 (include)"
+    checks:
+      - "Performing Test WEBP_HAVE_FLAG_NEON"
+    directories:
+      source: "C:/dev/SmartFill/build/CMakeFiles/CMakeScratch/TryCompile-mmsdqq"
+      binary: "C:/dev/SmartFill/build/CMakeFiles/CMakeScratch/TryCompile-mmsdqq"
+    cmakeVariables:
+      CMAKE_CUDA_ARCHITECTURES: "120"
+      CMAKE_CXX_STDLIB_MODULES_JSON: ""
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
+      CMAKE_C_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_POSITION_INDEPENDENT_CODE: "ON"
+    buildResult:
+      variable: "WEBP_HAVE_FLAG_NEON"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/dev/SmartFill/build/CMakeFiles/CMakeScratch/TryCompile-mmsdqq'
+        
+        Run Build Command(s): "C:/Program Files (x86)/Microsoft Visual Studio/2019/BuildTools/MSBuild/Current/Bin/MSBuild.exe" cmTC_cd0b5.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=16.0 /v:n
+        Microsoft (R) Build Engine version 16.11.6+a918ceb31 for .NET Framework
+        Copyright (C) Microsoft Corporation. All rights reserved.
+        
+        Build started 25/05/2026 9:21:34 AM.
+        Project "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mmsdqq\\cmTC_cd0b5.vcxproj" on node 1 (default targets).
+        PrepareForBuild:
+          Creating directory "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mmsdqq\\Debug\\".
+          Creating directory "cmTC_cd0b5.dir\\Debug\\cmTC_cd0b5.tlog\\".
+        InitializeBuildStatus:
+          Creating "cmTC_cd0b5.dir\\Debug\\cmTC_cd0b5.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+        VcpkgTripletSelection:
+          Using triplet "x64-windows" from "C:\\vcpkg\\installed\\x64-windows\\"
+          Using normalized configuration "Debug"
+        ClCompile:
+          C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Tools\\MSVC\\14.29.30133\\bin\\HostX64\\x64\\CL.exe /c /I"C:\\dev\\SmartFill\\third_party\\stable-diffusion.cpp\\thirdparty\\libwebp" /I"C:\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D WEBP_HAVE_FLAG_NEON /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /std:c11 /Fo"cmTC_cd0b5.dir\\Debug\\\\" /Fd"cmTC_cd0b5.dir\\Debug\\vc142.pdb" /external:W1 /TC /errorReport:queue  NOTFOUND "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mmsdqq\\src.c"
+          Microsoft (R) C/C++ Optimizing Compiler Version 19.29.30159 for x64
+          NOTFOUND
+          Copyright (C) Microsoft Corporation.  All rights reserved.
+          cl /c /I"C:\\dev\\SmartFill\\third_party\\stable-diffusion.cpp\\thirdparty\\libwebp" /I"C:\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D WEBP_HAVE_FLAG_NEON /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /std:c11 /Fo"cmTC_cd0b5.dir\\Debug\\\\" /Fd"cmTC_cd0b5.dir\\Debug\\vc142.pdb" /external:W1 /TC /errorReport:queue  NOTFOUND "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mmsdqq\\src.c"
+        c1 : fatal error C1083: Cannot open source file: 'NOTFOUND': No such file or directory [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mmsdqq\\cmTC_cd0b5.vcxproj]
+          src.c
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mmsdqq\\src.c(19,14): error C2065: 'this': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mmsdqq\\cmTC_cd0b5.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mmsdqq\\src.c(19,14): error C2146: syntax error: missing ';' before identifier 'is' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mmsdqq\\cmTC_cd0b5.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mmsdqq\\src.c(19,17): error C2065: 'is': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mmsdqq\\cmTC_cd0b5.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mmsdqq\\src.c(19,17): error C2146: syntax error: missing ';' before identifier 'not' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mmsdqq\\cmTC_cd0b5.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mmsdqq\\src.c(19,21): error C2065: 'not': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mmsdqq\\cmTC_cd0b5.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mmsdqq\\src.c(19,21): error C2146: syntax error: missing ';' before identifier 'valid' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mmsdqq\\cmTC_cd0b5.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mmsdqq\\src.c(19,27): error C2065: 'valid': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mmsdqq\\cmTC_cd0b5.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mmsdqq\\src.c(19,27): error C2146: syntax error: missing ';' before identifier 'code' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mmsdqq\\cmTC_cd0b5.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mmsdqq\\src.c(21,9): error C2065: 'code': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mmsdqq\\cmTC_cd0b5.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mmsdqq\\src.c(21,9): error C2143: syntax error: missing ';' before 'return' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mmsdqq\\cmTC_cd0b5.vcxproj]
+          Generating Code...
+        Done Building Project "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mmsdqq\\cmTC_cd0b5.vcxproj" (default targets) -- FAILED.
+        
+        Build FAILED.
+        
+        "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mmsdqq\\cmTC_cd0b5.vcxproj" (default target) (1) ->
+        (ClCompile target) -> 
+          c1 : fatal error C1083: Cannot open source file: 'NOTFOUND': No such file or directory [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mmsdqq\\cmTC_cd0b5.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mmsdqq\\src.c(19,14): error C2065: 'this': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mmsdqq\\cmTC_cd0b5.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mmsdqq\\src.c(19,14): error C2146: syntax error: missing ';' before identifier 'is' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mmsdqq\\cmTC_cd0b5.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mmsdqq\\src.c(19,17): error C2065: 'is': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mmsdqq\\cmTC_cd0b5.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mmsdqq\\src.c(19,17): error C2146: syntax error: missing ';' before identifier 'not' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mmsdqq\\cmTC_cd0b5.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mmsdqq\\src.c(19,21): error C2065: 'not': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mmsdqq\\cmTC_cd0b5.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mmsdqq\\src.c(19,21): error C2146: syntax error: missing ';' before identifier 'valid' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mmsdqq\\cmTC_cd0b5.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mmsdqq\\src.c(19,27): error C2065: 'valid': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mmsdqq\\cmTC_cd0b5.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mmsdqq\\src.c(19,27): error C2146: syntax error: missing ';' before identifier 'code' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mmsdqq\\cmTC_cd0b5.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mmsdqq\\src.c(21,9): error C2065: 'code': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mmsdqq\\cmTC_cd0b5.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mmsdqq\\src.c(21,9): error C2143: syntax error: missing ';' before 'return' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-mmsdqq\\cmTC_cd0b5.vcxproj]
+        
+            0 Warning(s)
+            11 Error(s)
+        
+        Time Elapsed 00:00:00.72
+        
+      exitCode: 1
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/Internal/CheckSourceCompiles.cmake:104 (try_compile)"
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CheckCSourceCompiles.cmake:103 (cmake_check_source_compiles)"
+      - "third_party/stable-diffusion.cpp/thirdparty/libwebp/cmake/cpu.cmake:32 (check_c_source_compiles)"
+      - "third_party/stable-diffusion.cpp/thirdparty/libwebp/cmake/cpu.cmake:117 (webp_check_compiler_flag)"
+      - "third_party/stable-diffusion.cpp/thirdparty/libwebp/cmake/deps.cmake:112 (include)"
+      - "third_party/stable-diffusion.cpp/thirdparty/libwebp/CMakeLists.txt:123 (include)"
+    checks:
+      - "Performing Test WEBP_HAVE_FLAG_MSA"
+    directories:
+      source: "C:/dev/SmartFill/build/CMakeFiles/CMakeScratch/TryCompile-31ubq9"
+      binary: "C:/dev/SmartFill/build/CMakeFiles/CMakeScratch/TryCompile-31ubq9"
+    cmakeVariables:
+      CMAKE_CUDA_ARCHITECTURES: "120"
+      CMAKE_CXX_STDLIB_MODULES_JSON: ""
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
+      CMAKE_C_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_POSITION_INDEPENDENT_CODE: "ON"
+    buildResult:
+      variable: "WEBP_HAVE_FLAG_MSA"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/dev/SmartFill/build/CMakeFiles/CMakeScratch/TryCompile-31ubq9'
+        
+        Run Build Command(s): "C:/Program Files (x86)/Microsoft Visual Studio/2019/BuildTools/MSBuild/Current/Bin/MSBuild.exe" cmTC_2cd3b.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=16.0 /v:n
+        Microsoft (R) Build Engine version 16.11.6+a918ceb31 for .NET Framework
+        Copyright (C) Microsoft Corporation. All rights reserved.
+        
+        Build started 25/05/2026 9:21:36 AM.
+        Project "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-31ubq9\\cmTC_2cd3b.vcxproj" on node 1 (default targets).
+        PrepareForBuild:
+          Creating directory "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-31ubq9\\Debug\\".
+          Creating directory "cmTC_2cd3b.dir\\Debug\\cmTC_2cd3b.tlog\\".
+        InitializeBuildStatus:
+          Creating "cmTC_2cd3b.dir\\Debug\\cmTC_2cd3b.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+        VcpkgTripletSelection:
+          Using triplet "x64-windows" from "C:\\vcpkg\\installed\\x64-windows\\"
+          Using normalized configuration "Debug"
+        ClCompile:
+          C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Tools\\MSVC\\14.29.30133\\bin\\HostX64\\x64\\CL.exe /c /I"C:\\dev\\SmartFill\\third_party\\stable-diffusion.cpp\\thirdparty\\libwebp" /I"C:\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D WEBP_HAVE_FLAG_MSA /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /std:c11 /Fo"cmTC_2cd3b.dir\\Debug\\\\" /Fd"cmTC_2cd3b.dir\\Debug\\vc142.pdb" /external:W1 /TC /errorReport:queue "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-31ubq9\\src.c"
+          Microsoft (R) C/C++ Optimizing Compiler Version 19.29.30159 for x64
+          src.c
+          Copyright (C) Microsoft Corporation.  All rights reserved.
+          cl /c /I"C:\\dev\\SmartFill\\third_party\\stable-diffusion.cpp\\thirdparty\\libwebp" /I"C:\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D WEBP_HAVE_FLAG_MSA /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /std:c11 /Fo"cmTC_2cd3b.dir\\Debug\\\\" /Fd"cmTC_2cd3b.dir\\Debug\\vc142.pdb" /external:W1 /TC /errorReport:queue "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-31ubq9\\src.c"
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-31ubq9\\src.c(19,14): error C2065: 'this': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-31ubq9\\cmTC_2cd3b.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-31ubq9\\src.c(19,14): error C2146: syntax error: missing ';' before identifier 'is' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-31ubq9\\cmTC_2cd3b.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-31ubq9\\src.c(19,17): error C2065: 'is': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-31ubq9\\cmTC_2cd3b.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-31ubq9\\src.c(19,17): error C2146: syntax error: missing ';' before identifier 'not' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-31ubq9\\cmTC_2cd3b.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-31ubq9\\src.c(19,21): error C2065: 'not': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-31ubq9\\cmTC_2cd3b.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-31ubq9\\src.c(19,21): error C2146: syntax error: missing ';' before identifier 'valid' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-31ubq9\\cmTC_2cd3b.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-31ubq9\\src.c(19,27): error C2065: 'valid': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-31ubq9\\cmTC_2cd3b.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-31ubq9\\src.c(19,27): error C2146: syntax error: missing ';' before identifier 'code' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-31ubq9\\cmTC_2cd3b.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-31ubq9\\src.c(21,9): error C2065: 'code': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-31ubq9\\cmTC_2cd3b.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-31ubq9\\src.c(21,9): error C2143: syntax error: missing ';' before 'return' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-31ubq9\\cmTC_2cd3b.vcxproj]
+        Done Building Project "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-31ubq9\\cmTC_2cd3b.vcxproj" (default targets) -- FAILED.
+        
+        Build FAILED.
+        
+        "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-31ubq9\\cmTC_2cd3b.vcxproj" (default target) (1) ->
+        (ClCompile target) -> 
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-31ubq9\\src.c(19,14): error C2065: 'this': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-31ubq9\\cmTC_2cd3b.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-31ubq9\\src.c(19,14): error C2146: syntax error: missing ';' before identifier 'is' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-31ubq9\\cmTC_2cd3b.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-31ubq9\\src.c(19,17): error C2065: 'is': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-31ubq9\\cmTC_2cd3b.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-31ubq9\\src.c(19,17): error C2146: syntax error: missing ';' before identifier 'not' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-31ubq9\\cmTC_2cd3b.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-31ubq9\\src.c(19,21): error C2065: 'not': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-31ubq9\\cmTC_2cd3b.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-31ubq9\\src.c(19,21): error C2146: syntax error: missing ';' before identifier 'valid' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-31ubq9\\cmTC_2cd3b.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-31ubq9\\src.c(19,27): error C2065: 'valid': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-31ubq9\\cmTC_2cd3b.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-31ubq9\\src.c(19,27): error C2146: syntax error: missing ';' before identifier 'code' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-31ubq9\\cmTC_2cd3b.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-31ubq9\\src.c(21,9): error C2065: 'code': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-31ubq9\\cmTC_2cd3b.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-31ubq9\\src.c(21,9): error C2143: syntax error: missing ';' before 'return' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-31ubq9\\cmTC_2cd3b.vcxproj]
+        
+            0 Warning(s)
+            10 Error(s)
+        
+        Time Elapsed 00:00:00.46
+        
+      exitCode: 1
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/Internal/CheckSourceCompiles.cmake:104 (try_compile)"
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CheckCSourceCompiles.cmake:103 (cmake_check_source_compiles)"
+      - "third_party/stable-diffusion.cpp/thirdparty/libwebp/cmake/cpu.cmake:32 (check_c_source_compiles)"
+      - "third_party/stable-diffusion.cpp/thirdparty/libwebp/cmake/cpu.cmake:124 (webp_check_compiler_flag)"
+      - "third_party/stable-diffusion.cpp/thirdparty/libwebp/cmake/deps.cmake:112 (include)"
+      - "third_party/stable-diffusion.cpp/thirdparty/libwebp/CMakeLists.txt:123 (include)"
+    checks:
+      - "Performing Test WEBP_HAVE_FLAG_MSA"
+    directories:
+      source: "C:/dev/SmartFill/build/CMakeFiles/CMakeScratch/TryCompile-frtg1w"
+      binary: "C:/dev/SmartFill/build/CMakeFiles/CMakeScratch/TryCompile-frtg1w"
+    cmakeVariables:
+      CMAKE_CUDA_ARCHITECTURES: "120"
+      CMAKE_CXX_STDLIB_MODULES_JSON: ""
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
+      CMAKE_C_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_POSITION_INDEPENDENT_CODE: "ON"
+    buildResult:
+      variable: "WEBP_HAVE_FLAG_MSA"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/dev/SmartFill/build/CMakeFiles/CMakeScratch/TryCompile-frtg1w'
+        
+        Run Build Command(s): "C:/Program Files (x86)/Microsoft Visual Studio/2019/BuildTools/MSBuild/Current/Bin/MSBuild.exe" cmTC_a9a92.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=16.0 /v:n
+        Microsoft (R) Build Engine version 16.11.6+a918ceb31 for .NET Framework
+        Copyright (C) Microsoft Corporation. All rights reserved.
+        
+        Build started 25/05/2026 9:21:37 AM.
+        Project "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-frtg1w\\cmTC_a9a92.vcxproj" on node 1 (default targets).
+        PrepareForBuild:
+          Creating directory "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-frtg1w\\Debug\\".
+          Creating directory "cmTC_a9a92.dir\\Debug\\cmTC_a9a92.tlog\\".
+        InitializeBuildStatus:
+          Creating "cmTC_a9a92.dir\\Debug\\cmTC_a9a92.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+        VcpkgTripletSelection:
+          Using triplet "x64-windows" from "C:\\vcpkg\\installed\\x64-windows\\"
+          Using normalized configuration "Debug"
+        ClCompile:
+          C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Tools\\MSVC\\14.29.30133\\bin\\HostX64\\x64\\CL.exe /c /I"C:\\dev\\SmartFill\\third_party\\stable-diffusion.cpp\\thirdparty\\libwebp" /I"C:\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D WEBP_HAVE_FLAG_MSA /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /std:c11 /Fo"cmTC_a9a92.dir\\Debug\\\\" /Fd"cmTC_a9a92.dir\\Debug\\vc142.pdb" /external:W1 /TC /errorReport:queue  NOTFOUND "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-frtg1w\\src.c"
+          Microsoft (R) C/C++ Optimizing Compiler Version 19.29.30159 for x64
+          NOTFOUND
+          Copyright (C) Microsoft Corporation.  All rights reserved.
+          cl /c /I"C:\\dev\\SmartFill\\third_party\\stable-diffusion.cpp\\thirdparty\\libwebp" /I"C:\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D WEBP_HAVE_FLAG_MSA /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /std:c11 /Fo"cmTC_a9a92.dir\\Debug\\\\" /Fd"cmTC_a9a92.dir\\Debug\\vc142.pdb" /external:W1 /TC /errorReport:queue  NOTFOUND "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-frtg1w\\src.c"
+        c1 : fatal error C1083: Cannot open source file: 'NOTFOUND': No such file or directory [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-frtg1w\\cmTC_a9a92.vcxproj]
+          src.c
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-frtg1w\\src.c(19,14): error C2065: 'this': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-frtg1w\\cmTC_a9a92.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-frtg1w\\src.c(19,14): error C2146: syntax error: missing ';' before identifier 'is' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-frtg1w\\cmTC_a9a92.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-frtg1w\\src.c(19,17): error C2065: 'is': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-frtg1w\\cmTC_a9a92.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-frtg1w\\src.c(19,17): error C2146: syntax error: missing ';' before identifier 'not' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-frtg1w\\cmTC_a9a92.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-frtg1w\\src.c(19,21): error C2065: 'not': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-frtg1w\\cmTC_a9a92.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-frtg1w\\src.c(19,21): error C2146: syntax error: missing ';' before identifier 'valid' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-frtg1w\\cmTC_a9a92.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-frtg1w\\src.c(19,27): error C2065: 'valid': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-frtg1w\\cmTC_a9a92.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-frtg1w\\src.c(19,27): error C2146: syntax error: missing ';' before identifier 'code' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-frtg1w\\cmTC_a9a92.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-frtg1w\\src.c(21,9): error C2065: 'code': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-frtg1w\\cmTC_a9a92.vcxproj]
+        C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-frtg1w\\src.c(21,9): error C2143: syntax error: missing ';' before 'return' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-frtg1w\\cmTC_a9a92.vcxproj]
+          Generating Code...
+        Done Building Project "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-frtg1w\\cmTC_a9a92.vcxproj" (default targets) -- FAILED.
+        
+        Build FAILED.
+        
+        "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-frtg1w\\cmTC_a9a92.vcxproj" (default target) (1) ->
+        (ClCompile target) -> 
+          c1 : fatal error C1083: Cannot open source file: 'NOTFOUND': No such file or directory [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-frtg1w\\cmTC_a9a92.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-frtg1w\\src.c(19,14): error C2065: 'this': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-frtg1w\\cmTC_a9a92.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-frtg1w\\src.c(19,14): error C2146: syntax error: missing ';' before identifier 'is' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-frtg1w\\cmTC_a9a92.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-frtg1w\\src.c(19,17): error C2065: 'is': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-frtg1w\\cmTC_a9a92.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-frtg1w\\src.c(19,17): error C2146: syntax error: missing ';' before identifier 'not' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-frtg1w\\cmTC_a9a92.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-frtg1w\\src.c(19,21): error C2065: 'not': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-frtg1w\\cmTC_a9a92.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-frtg1w\\src.c(19,21): error C2146: syntax error: missing ';' before identifier 'valid' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-frtg1w\\cmTC_a9a92.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-frtg1w\\src.c(19,27): error C2065: 'valid': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-frtg1w\\cmTC_a9a92.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-frtg1w\\src.c(19,27): error C2146: syntax error: missing ';' before identifier 'code' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-frtg1w\\cmTC_a9a92.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-frtg1w\\src.c(21,9): error C2065: 'code': undeclared identifier [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-frtg1w\\cmTC_a9a92.vcxproj]
+          C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-frtg1w\\src.c(21,9): error C2143: syntax error: missing ';' before 'return' [C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-frtg1w\\cmTC_a9a92.vcxproj]
+        
+            0 Warning(s)
+            11 Error(s)
+        
+        Time Elapsed 00:00:00.46
+        
+      exitCode: 1
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/Internal/CheckSourceCompiles.cmake:104 (try_compile)"
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/Internal/CheckCompilerFlag.cmake:18 (cmake_check_source_compiles)"
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CheckCXXCompilerFlag.cmake:103 (cmake_check_compiler_flag)"
+      - "third_party/stable-diffusion.cpp/thirdparty/libwebm/build/cxx_flags.cmake:26 (check_cxx_compiler_flag)"
+      - "third_party/stable-diffusion.cpp/thirdparty/libwebm/CMakeLists.txt:49 (add_cxx_flag_if_supported)"
+    checks:
+      - "Performing Test CXX_FLAG_SUPPORTED"
+    directories:
+      source: "C:/dev/SmartFill/build/CMakeFiles/CMakeScratch/TryCompile-m2fjg8"
+      binary: "C:/dev/SmartFill/build/CMakeFiles/CMakeScratch/TryCompile-m2fjg8"
+    cmakeVariables:
+      CMAKE_CUDA_ARCHITECTURES: "120"
+      CMAKE_CXX_FLAGS: "/DWIN32 /D_WINDOWS /EHsc -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS"
+      CMAKE_CXX_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_CXX_STDLIB_MODULES_JSON: ""
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+    buildResult:
+      variable: "CXX_FLAG_SUPPORTED"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/dev/SmartFill/build/CMakeFiles/CMakeScratch/TryCompile-m2fjg8'
+        
+        Run Build Command(s): "C:/Program Files (x86)/Microsoft Visual Studio/2019/BuildTools/MSBuild/Current/Bin/MSBuild.exe" cmTC_b1ef3.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=16.0 /v:n
+        Microsoft (R) Build Engine version 16.11.6+a918ceb31 for .NET Framework
+        Copyright (C) Microsoft Corporation. All rights reserved.
+        
+        Build started 25/05/2026 9:21:38 AM.
+        Project "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-m2fjg8\\cmTC_b1ef3.vcxproj" on node 1 (default targets).
+        PrepareForBuild:
+          Creating directory "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-m2fjg8\\Debug\\".
+          Creating directory "cmTC_b1ef3.dir\\Debug\\cmTC_b1ef3.tlog\\".
+        InitializeBuildStatus:
+          Creating "cmTC_b1ef3.dir\\Debug\\cmTC_b1ef3.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+        VcpkgTripletSelection:
+          Using triplet "x64-windows" from "C:\\vcpkg\\installed\\x64-windows\\"
+          Using normalized configuration "Debug"
+        ClCompile:
+          C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Tools\\MSVC\\14.29.30133\\bin\\HostX64\\x64\\CL.exe /c /I"C:\\vcpkg\\installed\\x64-windows\\include" /Zi /W4 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D __STDC_CONSTANT_MACROS /D __STDC_FORMAT_MACROS /D __STDC_LIMIT_MACROS /D CXX_FLAG_SUPPORTED /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /std:c++17 /Fo"cmTC_b1ef3.dir\\Debug\\\\" /Fd"cmTC_b1ef3.dir\\Debug\\vc142.pdb" /external:W4 /TP /errorReport:queue "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-m2fjg8\\src.cxx"
+          Microsoft (R) C/C++ Optimizing Compiler Version 19.29.30159 for x64
+          src.cxx
+          Copyright (C) Microsoft Corporation.  All rights reserved.
+          cl /c /I"C:\\vcpkg\\installed\\x64-windows\\include" /Zi /W4 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D __STDC_CONSTANT_MACROS /D __STDC_FORMAT_MACROS /D __STDC_LIMIT_MACROS /D CXX_FLAG_SUPPORTED /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /std:c++17 /Fo"cmTC_b1ef3.dir\\Debug\\\\" /Fd"cmTC_b1ef3.dir\\Debug\\vc142.pdb" /external:W4 /TP /errorReport:queue "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-m2fjg8\\src.cxx"
+        Link:
+          C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Tools\\MSVC\\14.29.30133\\bin\\HostX64\\x64\\link.exe /OUT:"C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-m2fjg8\\Debug\\cmTC_b1ef3.exe" /INCREMENTAL /ILK:"cmTC_b1ef3.dir\\Debug\\cmTC_b1ef3.ilk" /NOLOGO /LIBPATH:"C:\\vcpkg\\installed\\x64-windows\\debug\\lib" /LIBPATH:"C:\\vcpkg\\installed\\x64-windows\\debug\\lib\\manual-link" kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib "C:\\vcpkg\\installed\\x64-windows\\debug\\lib\\*.lib" /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/dev/SmartFill/build/CMakeFiles/CMakeScratch/TryCompile-m2fjg8/Debug/cmTC_b1ef3.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /IMPLIB:"C:/dev/SmartFill/build/CMakeFiles/CMakeScratch/TryCompile-m2fjg8/Debug/cmTC_b1ef3.lib" /MACHINE:X64  /machine:x64 cmTC_b1ef3.dir\\Debug\\src.obj
+          cmTC_b1ef3.vcxproj -> C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-m2fjg8\\Debug\\cmTC_b1ef3.exe
+        AppLocalFromInstalled:
+          pwsh.exe -ExecutionPolicy Bypass -noprofile -File "C:\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-m2fjg8\\Debug\\cmTC_b1ef3.exe" "C:\\vcpkg\\installed\\x64-windows\\debug\\bin" "cmTC_b1ef3.dir\\Debug\\cmTC_b1ef3.tlog\\cmTC_b1ef3.write.1u.tlog" "cmTC_b1ef3.dir\\Debug\\vcpkg.applocal.log"
+          'pwsh.exe' is not recognized as an internal or external command,
+          operable program or batch file.
+          The command "pwsh.exe -ExecutionPolicy Bypass -noprofile -File "C:\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-m2fjg8\\Debug\\cmTC_b1ef3.exe" "C:\\vcpkg\\installed\\x64-windows\\debug\\bin" "cmTC_b1ef3.dir\\Debug\\cmTC_b1ef3.tlog\\cmTC_b1ef3.write.1u.tlog" "cmTC_b1ef3.dir\\Debug\\vcpkg.applocal.log"" exited with code 9009.
+          "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -ExecutionPolicy Bypass -noprofile -File "C:\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-m2fjg8\\Debug\\cmTC_b1ef3.exe" "C:\\vcpkg\\installed\\x64-windows\\debug\\bin" "cmTC_b1ef3.dir\\Debug\\cmTC_b1ef3.tlog\\cmTC_b1ef3.write.1u.tlog" "cmTC_b1ef3.dir\\Debug\\vcpkg.applocal.log"
+        FinalizeBuildStatus:
+          Deleting file "cmTC_b1ef3.dir\\Debug\\cmTC_b1ef3.tlog\\unsuccessfulbuild".
+          Touching "cmTC_b1ef3.dir\\Debug\\cmTC_b1ef3.tlog\\cmTC_b1ef3.lastbuildstate".
+        Done Building Project "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-m2fjg8\\cmTC_b1ef3.vcxproj" (default targets).
+        
+        Build succeeded.
+            0 Warning(s)
+            0 Error(s)
+        
+        Time Elapsed 00:00:01.60
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/Internal/CheckSourceCompiles.cmake:104 (try_compile)"
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/Internal/CheckCompilerFlag.cmake:18 (cmake_check_source_compiles)"
+      - "C:/Program Files/CMake/share/cmake-4.3/Modules/CheckCXXCompilerFlag.cmake:103 (cmake_check_compiler_flag)"
+      - "third_party/stable-diffusion.cpp/thirdparty/libwebm/build/cxx_flags.cmake:26 (check_cxx_compiler_flag)"
+      - "third_party/stable-diffusion.cpp/thirdparty/libwebm/CMakeLists.txt:51 (add_cxx_flag_if_supported)"
+    checks:
+      - "Performing Test CXX_FLAG_SUPPORTED"
+    directories:
+      source: "C:/dev/SmartFill/build/CMakeFiles/CMakeScratch/TryCompile-t5aidj"
+      binary: "C:/dev/SmartFill/build/CMakeFiles/CMakeScratch/TryCompile-t5aidj"
+    cmakeVariables:
+      CMAKE_CUDA_ARCHITECTURES: "120"
+      CMAKE_CXX_FLAGS: "/DWIN32 /D_WINDOWS /EHsc -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS /W4"
+      CMAKE_CXX_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_CXX_STDLIB_MODULES_JSON: ""
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+    buildResult:
+      variable: "CXX_FLAG_SUPPORTED"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/dev/SmartFill/build/CMakeFiles/CMakeScratch/TryCompile-t5aidj'
+        
+        Run Build Command(s): "C:/Program Files (x86)/Microsoft Visual Studio/2019/BuildTools/MSBuild/Current/Bin/MSBuild.exe" cmTC_51a2c.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=16.0 /v:n
+        Microsoft (R) Build Engine version 16.11.6+a918ceb31 for .NET Framework
+        Copyright (C) Microsoft Corporation. All rights reserved.
+        
+        Build started 25/05/2026 9:21:40 AM.
+        Project "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-t5aidj\\cmTC_51a2c.vcxproj" on node 1 (default targets).
+        PrepareForBuild:
+          Creating directory "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-t5aidj\\Debug\\".
+          Creating directory "cmTC_51a2c.dir\\Debug\\cmTC_51a2c.tlog\\".
+        InitializeBuildStatus:
+          Creating "cmTC_51a2c.dir\\Debug\\cmTC_51a2c.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+        VcpkgTripletSelection:
+          Using triplet "x64-windows" from "C:\\vcpkg\\installed\\x64-windows\\"
+          Using normalized configuration "Debug"
+        ClCompile:
+          C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Tools\\MSVC\\14.29.30133\\bin\\HostX64\\x64\\CL.exe /c /I"C:\\vcpkg\\installed\\x64-windows\\include" /Zi /W4 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D __STDC_CONSTANT_MACROS /D __STDC_FORMAT_MACROS /D __STDC_LIMIT_MACROS /D CXX_FLAG_SUPPORTED /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /std:c++17 /Fo"cmTC_51a2c.dir\\Debug\\\\" /Fd"cmTC_51a2c.dir\\Debug\\vc142.pdb" /external:W4 /TP /wd4996 /errorReport:queue "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-t5aidj\\src.cxx"
+          Microsoft (R) C/C++ Optimizing Compiler Version 19.29.30159 for x64
+          src.cxx
+          Copyright (C) Microsoft Corporation.  All rights reserved.
+          cl /c /I"C:\\vcpkg\\installed\\x64-windows\\include" /Zi /W4 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D __STDC_CONSTANT_MACROS /D __STDC_FORMAT_MACROS /D __STDC_LIMIT_MACROS /D CXX_FLAG_SUPPORTED /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /std:c++17 /Fo"cmTC_51a2c.dir\\Debug\\\\" /Fd"cmTC_51a2c.dir\\Debug\\vc142.pdb" /external:W4 /TP /wd4996 /errorReport:queue "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-t5aidj\\src.cxx"
+        Link:
+          C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Tools\\MSVC\\14.29.30133\\bin\\HostX64\\x64\\link.exe /OUT:"C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-t5aidj\\Debug\\cmTC_51a2c.exe" /INCREMENTAL /ILK:"cmTC_51a2c.dir\\Debug\\cmTC_51a2c.ilk" /NOLOGO /LIBPATH:"C:\\vcpkg\\installed\\x64-windows\\debug\\lib" /LIBPATH:"C:\\vcpkg\\installed\\x64-windows\\debug\\lib\\manual-link" kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib "C:\\vcpkg\\installed\\x64-windows\\debug\\lib\\*.lib" /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/dev/SmartFill/build/CMakeFiles/CMakeScratch/TryCompile-t5aidj/Debug/cmTC_51a2c.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /IMPLIB:"C:/dev/SmartFill/build/CMakeFiles/CMakeScratch/TryCompile-t5aidj/Debug/cmTC_51a2c.lib" /MACHINE:X64  /machine:x64 cmTC_51a2c.dir\\Debug\\src.obj
+          cmTC_51a2c.vcxproj -> C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-t5aidj\\Debug\\cmTC_51a2c.exe
+        AppLocalFromInstalled:
+          pwsh.exe -ExecutionPolicy Bypass -noprofile -File "C:\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-t5aidj\\Debug\\cmTC_51a2c.exe" "C:\\vcpkg\\installed\\x64-windows\\debug\\bin" "cmTC_51a2c.dir\\Debug\\cmTC_51a2c.tlog\\cmTC_51a2c.write.1u.tlog" "cmTC_51a2c.dir\\Debug\\vcpkg.applocal.log"
+          'pwsh.exe' is not recognized as an internal or external command,
+          operable program or batch file.
+          The command "pwsh.exe -ExecutionPolicy Bypass -noprofile -File "C:\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-t5aidj\\Debug\\cmTC_51a2c.exe" "C:\\vcpkg\\installed\\x64-windows\\debug\\bin" "cmTC_51a2c.dir\\Debug\\cmTC_51a2c.tlog\\cmTC_51a2c.write.1u.tlog" "cmTC_51a2c.dir\\Debug\\vcpkg.applocal.log"" exited with code 9009.
+          "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -ExecutionPolicy Bypass -noprofile -File "C:\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-t5aidj\\Debug\\cmTC_51a2c.exe" "C:\\vcpkg\\installed\\x64-windows\\debug\\bin" "cmTC_51a2c.dir\\Debug\\cmTC_51a2c.tlog\\cmTC_51a2c.write.1u.tlog" "cmTC_51a2c.dir\\Debug\\vcpkg.applocal.log"
+        FinalizeBuildStatus:
+          Deleting file "cmTC_51a2c.dir\\Debug\\cmTC_51a2c.tlog\\unsuccessfulbuild".
+          Touching "cmTC_51a2c.dir\\Debug\\cmTC_51a2c.tlog\\cmTC_51a2c.lastbuildstate".
+        Done Building Project "C:\\dev\\SmartFill\\build\\CMakeFiles\\CMakeScratch\\TryCompile-t5aidj\\cmTC_51a2c.vcxproj" (default targets).
+        
+        Build succeeded.
+            0 Warning(s)
+            0 Error(s)
+        
+        Time Elapsed 00:00:01.92
+        
+      exitCode: 0
+...

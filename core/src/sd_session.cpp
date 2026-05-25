@@ -288,6 +288,27 @@ bool SdSession::generate(const SdGenerateParams& params,
     gen_params.vae_tiling_params.rel_size_y      = 0.5f;
     gen_params.vae_tiling_params.extra_tiling_args = nullptr;
 
+    // LoRAs. Build the sd_lora_t array referencing the string memory
+    // already owned by params.loras (which the caller keeps alive across
+    // this call). When params.loras is empty, leave gen_params.loras at
+    // the _init default (nullptr) and lora_count at 0 - this also signals
+    // sd.cpp to revert any LoRAs applied in a previous generate() call
+    // (which is what we want; LoRA persistence across generations would
+    // be surprising).
+    std::vector<sd_lora_t> sd_loras;
+    sd_loras.reserve(params.loras.size());
+    for (const auto& l : params.loras) {
+        sd_lora_t sl{};
+        sl.path          = l.path.c_str();
+        sl.multiplier    = l.weight;
+        sl.is_high_noise = false;  // only for Wan video models
+        sd_loras.push_back(sl);
+    }
+    if (!sd_loras.empty()) {
+        gen_params.loras      = sd_loras.data();
+        gen_params.lora_count = static_cast<int>(sd_loras.size());
+    }
+
     sd_image_t* result = generate_image(impl_->ctx, &gen_params);
 
     // Detach callback (later calls will replace it).
