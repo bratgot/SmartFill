@@ -318,6 +318,33 @@ bool SdSession::generate(const SdGenerateParams& params,
         gen_params.lora_count = static_cast<int>(sd_loras.size());
     }
 
+    // img2img: attach init image if caller supplied one. sd.cpp encodes it
+    // through the VAE on its end and uses it as the denoising start point.
+    // strength controls how much of the input survives; sd.cpp's _init
+    // default is 0.75 which we mirror in SdGenerateParams.
+    //
+    // sd_image_t below borrows the user-provided buffer's memory; params
+    // must stay alive (and unmodified) until generate_image returns.
+    sd_image_t init_image_value{};
+    if (!params.init_image_rgb.empty()
+        && params.init_image_width  > 0
+        && params.init_image_height > 0) {
+        const size_t expected =
+            static_cast<size_t>(params.init_image_width) *
+            static_cast<size_t>(params.init_image_height) * 3u;
+        if (params.init_image_rgb.size() == expected) {
+            init_image_value.width   = static_cast<uint32_t>(params.init_image_width);
+            init_image_value.height  = static_cast<uint32_t>(params.init_image_height);
+            init_image_value.channel = 3;
+            init_image_value.data    =
+                const_cast<uint8_t*>(params.init_image_rgb.data());
+            gen_params.init_image = init_image_value;
+            gen_params.strength   = params.strength;
+        }
+        // If size doesn't match dimensions, silently fall back to txt2img.
+        // Caller (Op) is responsible for consistency.
+    }
+
     // ControlNet: attach only when the loaded context has a control_net
     // AND the caller supplied a control image. The sd_image_t below
     // borrows the user-provided buffer's memory; params must stay alive

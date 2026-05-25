@@ -74,6 +74,22 @@ struct SdGenerateParams {
     // (and reverts any LoRAs from prior generate() calls).
     std::vector<LoRASpec> loras;
 
+    // Optional img2img source image. When set, sd.cpp encodes this through
+    // the VAE to produce a starting latent and denoises from there instead
+    // of from pure noise. Strength controls how much of the input survives
+    // (0.0 = output equals input, 1.0 = pure txt2img, ignores input).
+    //
+    // Layout matches the ControlNet image below: HWC uint8 RGB, TOP-DOWN
+    // scanline order. Dimensions don't have to match output width/height
+    // (sd.cpp resamples internally) but should be close to avoid distortion.
+    //
+    // The init image and ControlNet image are independent - both, neither,
+    // or either alone are all valid.
+    std::vector<uint8_t> init_image_rgb;
+    int   init_image_width  = 0;
+    int   init_image_height = 0;
+    float strength          = 0.75f;  // typical img2img sweet spot
+
     // Optional ControlNet input. Used only when ALL of the following:
     //   - SdModelPaths::control_net is a valid loaded ControlNet model
     //   - control_image_rgb is non-empty

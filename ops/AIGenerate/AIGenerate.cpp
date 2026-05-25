@@ -107,6 +107,7 @@ public:
         , steps_(4)
         , cfg_scale_(1.0f)
         , seed_(-1)
+        , strength_(0.75f)
         , progress_(0.0f)
         , prompt_("")
         , negative_prompt_("")
@@ -124,19 +125,22 @@ public:
         , last_seed_text_("")
         , last_resolved_seed_(0)
     {
-        inputs(1);
+        inputs(2);
     }
 
     const char* Class() const override     { return description.name; }
     const char* node_help() const override { return AI_GENERATE_HELP; }
 
-    // One optional input: the ControlNet structural-guidance image
-    // (depth map, edge map, etc). Generation works fine with nothing
-    // connected (plain txt2img).
+    // Two optional inputs:
+    //   0 = img2img source image (the image to restyle).
+    //   1 = ControlNet structural guidance (depth, edges, etc).
+    // Both are optional. Pure txt2img works with nothing connected.
     int minimum_inputs() const override { return 0; }
-    int maximum_inputs() const override { return 1; }
+    int maximum_inputs() const override { return 2; }
     const char* input_label(int n, char*) const override {
-        return n == 0 ? "ControlNet" : "";
+        if (n == 0) return "Source";
+        if (n == 1) return "ControlNet";
+        return "";
     }
 
     void knobs(Knob_Callback f) override;
@@ -153,6 +157,7 @@ private:
     int    width_, height_, steps_;
     float  cfg_scale_;
     int    seed_;
+    float  strength_;
     float  progress_;
     const char* prompt_;
     const char* negative_prompt_;
@@ -240,6 +245,21 @@ void AIGenerate::knobs(Knob_Callback f)
     SetRange(f, 1.0, 15.0);
     Tooltip(f, "Classifier-free guidance scale. FLUX schnell does not "
                "use CFG; leave at 1.0.");
+
+    Float_knob(f, &strength_, "strength", "Img2Img Strength");
+    SetRange(f, 0.0, 1.0);
+    Tooltip(f, "Img2img denoising strength. Only used when the Source "
+               "input (input 0) is connected.\n\n"
+               "  0.0 = output equals input (no change)\n"
+               "  0.4 = mild restyling, structure mostly preserved\n"
+               "  0.75 = strong restyling (default, typical sweet spot)\n"
+               "  1.0 = ignore input, pure txt2img\n\n"
+               "Lower values keep more of the original image; higher "
+               "values let the prompt drive the output more. With FLUX "
+               "schnell's 4 steps the effective range is narrow - try "
+               "0.5-0.85 for most restyling tasks.\n\n"
+               "When the Source input is not connected, this knob has "
+               "no effect.");
 
     // ---- Bake controls ----
     Divider(f, "");
@@ -333,15 +353,22 @@ void AIGenerate::knobs(Knob_Callback f)
                "an edge map, depth pass, or whatever matches the ControlNet "
                "model's training data. Convert it from RGB image in Nuke "
                "(e.g. EdgeDetect or a CG depth pass) before piping it in.\n\n"
-               "Use a ControlNet trained for the same base model as the "
-               "Diffusion Model: FLUX schnell needs a FLUX ControlNet, "
-               "SDXL needs an SDXL ControlNet, etc. Mismatches load but "
-               "produce noise.\n\n"
-               "WARNING: BFL's official FLUX.1-Canny-dev and "
-               "FLUX.1-Depth-dev ControlNets are non-commercial-licensed. "
-               "For commercial studio use, use Apache 2.0 FLUX ControlNets "
-               "from InstantX, Shakker-Labs, or similar (verify each "
-               "model's license).");
+               "*** IMPORTANT UPSTREAM LIMITATION ***\n"
+               "stable-diffusion.cpp's ControlNet loader currently supports "
+               "only U-Net architectures (SD 1.5, SDXL). FLUX, SD3, and "
+               "Wan use transformer architectures (DiT) and their "
+               "ControlNets will FAIL to load (look for 'unknown tensor' "
+               "and 'tensor not in model file' errors in the log).\n\n"
+               "Until sd.cpp adds DiT ControlNet support upstream, this "
+               "knob is useful only when generating with an SDXL or SD 1.5 "
+               "base model, paired with a ControlNet trained for that "
+               "base. With the default FLUX schnell pipeline, this feature "
+               "is effectively unavailable.\n\n"
+               "WARNING: Even if upstream adds FLUX support, BFL's "
+               "official FLUX.1-Canny-dev and FLUX.1-Depth-dev ControlNets "
+               "are non-commercial-licensed. For commercial studio use, "
+               "look for Apache 2.0 FLUX ControlNets from InstantX, "
+               "Shakker-Labs, or similar (verify each model's license).");
 
     Float_knob(f, &control_strength_, "control_strength", "Control Strength");
     SetRange(f, 0.0, 2.0);
@@ -818,13 +845,31 @@ std::string AIGenerate::compute_cache_key() const
         kb.add(l.weight);
     }
 
+    // img2img state: strength, and if input 0 is connected, the upstream
+    // node's hash (covers pixel content + format). When no input is
+    // connected, strength has no effect, but we still include both in the
+    // key so disconnecting and reconnecting a different image invalidates
+    // the cache correctly.
+    kb.add(std::string("img2img"));
+    {
+        Op* in = const_cast<AIGenerate*>(this)->input(0);
+        if (in) {
+            kb.add(strength_);
+            DD::Image::Hash input_hash;
+            in->append(input_hash);
+            kb.add(static_cast<int64_t>(input_hash.value()));
+        } else {
+            kb.add(std::string("no_input"));
+        }
+    }
+
     // ControlNet state: model path, strength, and if an input is
     // connected, the upstream node's hash (covers pixel content + format).
     kb.add(std::string("controlnet"));
     kb.add(normalize_path(ep.control_net));
     if (!ep.control_net.empty()) {
         kb.add(control_strength_);
-        Op* in = const_cast<AIGenerate*>(this)->input(0);
+        Op* in = const_cast<AIGenerate*>(this)->input(1);
         if (in) {
             DD::Image::Hash input_hash;
             in->append(input_hash);
@@ -1060,6 +1105,31 @@ void AIGenerate::start_bake()
         return;
     }
 
+    // img2img source pixels. Active whenever input 0 is connected;
+    // strength comes from the knob. No model-path gating like ControlNet
+    // since img2img uses the same diffusion model.
+    std::vector<uint8_t> init_image_rgb;
+    int init_image_w = 0;
+    int init_image_h = 0;
+    {
+        Iop* init_in = dynamic_cast<Iop*>(input(0));
+        if (init_in) {
+            std::string read_err;
+            if (!read_input_rgb_u8(init_in, init_image_rgb,
+                                   init_image_w, init_image_h,
+                                   read_err)) {
+                error("AIGenerate: Source input read failed: %s",
+                      read_err.c_str());
+                set_status("Error: img2img input read failed");
+                return;
+            }
+            std::fprintf(stderr,
+                "[AIGenerate] img2img active: %dx%d source, strength %.2f\n",
+                init_image_w, init_image_h,
+                static_cast<double>(strength_));
+        }
+    }
+
     // ControlNet input pixels. Only read when BOTH the model path is set
     // AND the upstream input is connected. If model is set but input is
     // not, fall through to plain txt2img and warn in the log; this is
@@ -1068,7 +1138,7 @@ void AIGenerate::start_bake()
     int control_image_w = 0;
     int control_image_h = 0;
     if (!paths.control_net.empty()) {
-        Iop* control_in = dynamic_cast<Iop*>(input(0));
+        Iop* control_in = dynamic_cast<Iop*>(input(1));
         if (control_in) {
             std::string read_err;
             if (!read_input_rgb_u8(control_in, control_image_rgb,
@@ -1154,11 +1224,14 @@ void AIGenerate::start_bake()
     set_progress(0.0f);
     set_status("Cooking 0%");
 
-    // Capture ControlNet state by value into the worker.
+    // Capture img2img and ControlNet state by value into the worker.
+    const float strength_val         = strength_;
     const float control_strength_val = control_strength_;
 
     worker_.start([prompt, neg_prompt, W, H, steps, seed, cfg, paths,
                    cache_path, loras,
+                   init_image_rgb, init_image_w, init_image_h,
+                   strength_val,
                    control_image_rgb, control_image_w, control_image_h,
                    control_strength_val]
                   (nf::AiWorkerContext& ctx) {
@@ -1184,7 +1257,11 @@ void AIGenerate::start_bake()
         params.steps            = steps;
         params.seed             = seed;
         params.cfg_scale        = cfg;
-        params.loras            = loras;  // captured by-value; strings owned here
+        params.loras            = loras;
+        params.init_image_rgb       = init_image_rgb;
+        params.init_image_width     = init_image_w;
+        params.init_image_height    = init_image_h;
+        params.strength             = strength_val;
         params.control_image_rgb    = control_image_rgb;
         params.control_image_width  = control_image_w;
         params.control_image_height = control_image_h;
