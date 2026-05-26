@@ -1290,6 +1290,186 @@ the values inside will produce correct math. When debugging a
 generative model that "runs but produces garbage," **swap the
 weight file before tweaking anything in the inference config.**
 
+## 21. Downloading large model files on Windows: never use `Invoke-WebRequest`
+
+Multi-GB model downloads (SDXL bases, ControlNets, T5 encoders,
+GGUFs) on Windows have one consistent pitfall: PowerShell's
+`Invoke-WebRequest` cmdlet is shockingly slow at this. We saw a
+2.5 GB ControlNet crawling at 0.3 - 1.8 MB/s when the same file
+downloaded from a browser at over 100 MB/s on the same machine
+and the same connection.
+
+The cause is `$ProgressPreference = 'Continue'` (the default).
+The progress bar rendering for binary streams is so expensive
+that it throttles the download itself. This is documented
+behavior, not a bug, and applies to both PowerShell 5.1 and 7.x.
+
+### 21.1 Fast download options, in order of preference
+
+1. **A browser**. For one-off downloads of public-URL model
+   files, just open the URL and click download. No code, no
+   gotchas, hits the connection's full bandwidth.
+
+2. **`curl.exe`** (real curl, ships with Windows 10+ at
+   `C:\Windows\System32\curl.exe`):
+   ```powershell
+   curl.exe -L -o "C:\path\to\file.safetensors" `
+     "https://huggingface.co/.../resolve/main/file.safetensors"
+   ```
+   `-L` follows redirects (HuggingFace uses 302s for LFS
+   files). Hits full bandwidth, real progress bar, ~10-50x
+   faster than `Invoke-WebRequest`.
+
+   Note: must say `curl.exe` explicitly, not bare `curl`.
+   PowerShell aliases `curl` to `Invoke-WebRequest`, which
+   defeats the entire point.
+
+3. **`Invoke-WebRequest` with progress disabled** if you must
+   stay in pure PowerShell (e.g. for a script you're handing
+   off):
+   ```powershell
+   $ProgressPreference = 'SilentlyContinue'
+   Invoke-WebRequest -Uri $url -OutFile $dest
+   $ProgressPreference = 'Continue'
+   ```
+   Still slower than curl.exe but a 10x+ speedup vs. the
+   default.
+
+### 21.2 When to bother
+
+For files under ~50 MB it doesn't matter; `Invoke-WebRequest`
+is fine. The issue is binary streams over a few hundred MB,
+which is exactly where AI/ML model files live. Anything
+labeled "SDXL", "FLUX", "T5", "ControlNet", or sitting on
+HuggingFace LFS is a candidate.
+
+### 21.3 The general principle
+
+PowerShell cmdlets are convenient for typical admin work
+(small JSON APIs, config files, small scripts). They are not
+designed as bulk-binary download tools. For multi-GB files,
+reach for a tool built for the job — `curl.exe`, a browser,
+or `aria2c` if you want parallel segments. Don't trust the
+default cmdlet just because it's there.
+
+## 22. sd.cpp ControlNet loader doesn't translate diffusers names
+
+A class of upstream limitation that costs hours if you don't know
+about it: sd.cpp's UNet base loader has a tensor-name conversion
+table that maps diffusers naming (`down_blocks.*`, `up_blocks.*`,
+`mid_block.*`, `time_embedding.*`, `add_embedding.*`) to legacy
+A1111/ComfyUI naming (`input_blocks.*`, `output_blocks.*`,
+`middle_block.*`, `time_embed.*`, `label_emb.*`). The
+ControlNet loader does NOT have that table.
+
+This means SDXL ControlNets fail to load even when they look right.
+Symptom: hundreds of `unknown tensor 'down_blocks.X...'` warnings
+during load, followed by hundreds of `tensor 'input_blocks.X...'
+not in model file` errors. Loader returns failure; ensure_loaded
+returns NULL.
+
+### 22.1 The naming difference
+
+Same architecture, two conventions:
+
+| diffusers                         | legacy (sd.cpp ControlNet) |
+| --------------------------------- | -------------------------- |
+| `conv_in.*`                       | `input_blocks.0.0.*`       |
+| `time_embedding.linear_{1,2}.*`   | `time_embed.{0,2}.*`       |
+| `add_embedding.linear_{1,2}.*`    | `label_emb.0.{0,2}.*`      |
+| `controlnet_cond_embedding.*`     | `input_hint_block.*`       |
+| `controlnet_down_blocks.N.*`      | `zero_convs.N.0.*`         |
+| `controlnet_mid_block.*`          | `middle_block_out.0.*`     |
+| `down_blocks.X.resnets.Y.*`       | `input_blocks.<idx>.0.*`   |
+| `down_blocks.X.attentions.Y.*`    | `input_blocks.<idx>.1.*`   |
+| `down_blocks.X.downsamplers.0.*`  | `input_blocks.<idx>.0.op.*`|
+| `mid_block.resnets.{0,1}.*`       | `middle_block.{0,2}.*`     |
+| `mid_block.attentions.0.*`        | `middle_block.1.*`         |
+
+Within each ResBlock, the substructure rename is also needed:
+`conv1` -> `in_layers.2`, `norm1` -> `in_layers.0`, `conv2` ->
+`out_layers.3`, `norm2` -> `out_layers.0`, `time_emb_proj` ->
+`emb_layers.1`, `conv_shortcut` -> `skip_connection`.
+
+### 22.2 What we learned the hard way
+
+The lllyasviel/sd_control_collection on HuggingFace looks like it
+contains converted files (filenames suggest A1111 use), but most
+of them are just re-uploads of the diffusers originals in
+diffusers naming. Don't trust filenames; check tensor names first.
+
+The `*lora.safetensors` files in that collection are a different
+trap: they ARE in legacy naming, but every weight is decomposed
+into rank-N `.down`/`.up` factors -- they're ControlLoRA, not
+ControlNet. sd.cpp's ControlNet loader can't merge LoRA factors
+at load time; it needs full weights.
+
+There is no published full SDXL ControlNet in legacy naming that
+we found.
+
+### 22.3 The fix: tools/convert_sdxl_controlnet.py
+
+A standalone Python script under `tools/` in this repo does the
+diffusers -> legacy rename and writes a new safetensors file.
+Dependencies: `safetensors`, `numpy`. Usage:
+
+```
+python tools/convert_sdxl_controlnet.py \
+    diffusers_xl_canny_full.safetensors \
+    sdxl_canny_legacy.safetensors
+```
+
+The converted file loads cleanly in sd.cpp with no unknown
+tensors. Run-once per ControlNet model; output is permanent.
+
+### 22.4 The general principle
+
+When a C++ inference library accepts multiple weight formats,
+the format-conversion logic tends to be unevenly applied across
+sub-systems. The UNet path gets it because everyone uses it; the
+ControlNet path doesn't because most users either run with
+ComfyUI-format files or use a different inference engine. The
+fix is upstream PR territory; the workaround is convert the
+file once on disk. Always inspect a few tensor names with
+`safetensors` Python tools before assuming a downloaded file is
+"the right format."
+
+### 22.5 The proj_in/proj_out Linear-vs-Conv gotcha
+
+After renaming was solved, a second mismatch appeared:
+
+```
+tensor 'input_blocks.4.1.proj_in.weight' has wrong shape:
+  got [640, 640, 1, 1], expected [1, 1, 640, 640]
+```
+
+Same dimensions, different order. Cause: SDXL's
+`Transformer2DModel` is instantiated with
+`use_linear_projection=True`, so `proj_in` and `proj_out` are
+`nn.Linear` -- 2D weights `[out, in]`. Legacy ComfyUI / sd.cpp
+expect them as 1x1 `nn.Conv2d` -- 4D weights `[out, in, 1, 1]`.
+Mathematically equivalent (a 1x1 conv applied per-spatial-pixel
+is identical to a Linear), but the storage layout differs and
+sd.cpp's loader does strict shape comparison.
+
+The fix is a one-line reshape during conversion:
+
+```python
+if (k.endswith('.proj_in.weight') or k.endswith('.proj_out.weight')) \
+       and t.ndim == 2:
+    t = t.reshape(t.shape[0], t.shape[1], 1, 1)
+```
+
+This is SDXL-specific. SD1.5 ControlNets use Conv2d natively
+(`use_linear_projection=False`), so their proj_in/out are
+already 4D and don't need reshaping. The conversion script
+checks `t.ndim == 2` defensively so it works for both.
+
+`attn1`/`attn2` internal projections (`to_q/k/v.weight`,
+`to_out.0.weight`) and `ff.net.*` are nn.Linear in both
+diffusers and legacy, so they need no reshape -- only `proj_in`
+and `proj_out` differ.
+
 ---
 
 *Updated through the nuke-ai-fill FLUX integration (May 2026),
@@ -1297,5 +1477,7 @@ including the Windows-System32-ONNX battle, DDImage knob-storage
 discovery, viewer-refresh investigation, Carve LaMa-ONNX
 normalization convention, sd.cpp _init-defaults discipline, VAE
 tiling for VRAM headroom, and GGUF file-format-vs-tool
-compatibility. Add an entry here when a new gotcha costs a
+compatibility, the Windows large-file download (curl.exe over
+Invoke-WebRequest) lesson, and the diffusers-vs-legacy SDXL
+ControlNet tensor naming conversion. Add an entry here when a new gotcha costs a
 debugging round.*
