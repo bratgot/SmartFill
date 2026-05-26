@@ -108,6 +108,7 @@ public:
         , cfg_scale_(1.0f)
         , seed_(-1)
         , strength_(0.75f)
+        , cook_revision_(0)
         , progress_(0.0f)
         , prompt_("")
         , negative_prompt_("")
@@ -158,6 +159,13 @@ private:
     float  cfg_scale_;
     int    seed_;
     float  strength_;
+
+    // Bumped from menu.py when a bake just finished, so the cache file
+    // on disk now contains pixels we want to use. Participates in
+    // append(Hash&) so changes invalidate Nuke's internal output cache
+    // and force a re-cook (which is what makes the freshly-baked image
+    // appear in the viewer without manual knob nudging).
+    int    cook_revision_;
     float  progress_;
     const char* prompt_;
     const char* negative_prompt_;
@@ -285,6 +293,24 @@ void AIGenerate::knobs(Knob_Callback f)
                "shows the random value picked. Useful for reproducing "
                "a specific result.");
 
+    // Hidden knobs supporting viewer auto-refresh.
+    //
+    // cook_revision is an integer that participates in append(Hash&).
+    // When it changes, Nuke considers the Op's output stale and will
+    // recook. menu.py's polling code increments it (via the
+    // bump_cook_revision button below) when a bake transitions from
+    // active to done, which makes the freshly-cached pixels appear in
+    // the viewer without manual knob nudging.
+    //
+    // Both are NO_ANIMATION because they participate in caching at
+    // a global level; per-frame variation would invalidate the cache
+    // on every frame change.
+    Int_knob(f, &cook_revision_, "cook_revision", "");
+    SetFlags(f, Knob::INVISIBLE | Knob::NO_ANIMATION | Knob::DO_NOT_WRITE);
+
+    Button(f, "bump_cook_revision", "");
+    SetFlags(f, Knob::INVISIBLE | Knob::DO_NOT_WRITE);
+
     // ---- Models tab ----
     Tab_knob(f, "Models");
 
@@ -401,6 +427,18 @@ int AIGenerate::knob_changed(Knob* k)
         clear_cache_on_disk();
         return 1;
     }
+    if (std::strcmp(name, "bump_cook_revision") == 0) {
+        // Triggered from menu.py after a bake completes. Mutate the
+        // cook_revision knob through the knob system (NOT direct
+        // member write) so Nuke registers it as a real value change,
+        // updates the hash, and forces a re-cook.
+        Knob* cr = knob("cook_revision");
+        if (cr) {
+            const int next = cook_revision_ + 1;
+            cr->set_value(static_cast<double>(next));
+        }
+        return 1;
+    }
 
     return Iop::knob_changed(k);
 }
@@ -413,6 +451,10 @@ void AIGenerate::append(Hash& hash)
 {
     Iop::append(hash);
     hash.append(loaded_key_);
+    // cook_revision is bumped from menu.py when a bake completes;
+    // including it here makes the hash change which forces Nuke to
+    // recook the Op and pick up the newly-cached pixels.
+    hash.append(cook_revision_);
 }
 
 // ----------------------------------------------------------------------
