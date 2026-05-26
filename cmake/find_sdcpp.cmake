@@ -78,6 +78,14 @@ set(GGML_METAL  OFF CACHE BOOL "" FORCE)
 set(GGML_CUDA_FORCE_MMQ ON CACHE BOOL "" FORCE)
 
 # ----------------------------------------------------------------------
+# Apply local patches to sd.cpp source. Idempotent; runs every cmake
+# configure so a freshly cloned/upgraded sd.cpp gets patched automatically.
+# See cmake/patch_sdcpp.cmake for the patch list and rationale.
+# ----------------------------------------------------------------------
+
+include("${CMAKE_CURRENT_LIST_DIR}/patch_sdcpp.cmake")
+
+# ----------------------------------------------------------------------
 # Wrap sd.cpp's CMake into ours via add_subdirectory. EXCLUDE_FROM_ALL
 # so the executables aren't built even if SD_BUILD_EXAMPLES sneaks back.
 # ----------------------------------------------------------------------
