@@ -137,20 +137,13 @@ void SdSession::request_cancel() {
 bool SdSession::ensure_loaded(const SdModelPaths& paths,
                               std::string& error_out)
 {
+    // Only the diffusion model is mandatory at this layer. The other
+    // three (vae, clip_l, t5xxl) are validated by the caller (Op level)
+    // for FLUX and left empty for SDXL/SD1.5 (which embed their own
+    // copies in the diffusion model file). sd_session passes nullptr
+    // to sd.cpp for empty paths, and sd.cpp uses the embedded copies.
     if (paths.diffusion_model.empty()) {
         error_out = "ensure_loaded: diffusion_model path is empty";
-        return false;
-    }
-    if (paths.vae.empty()) {
-        error_out = "ensure_loaded: vae path is empty";
-        return false;
-    }
-    if (paths.clip_l.empty()) {
-        error_out = "ensure_loaded: clip_l path is empty";
-        return false;
-    }
-    if (paths.t5xxl.empty()) {
-        error_out = "ensure_loaded: t5xxl path is empty";
         return false;
     }
 
@@ -185,11 +178,47 @@ bool SdSession::ensure_loaded(const SdModelPaths& paths,
     sd_ctx_params_t ctx_params;
     sd_ctx_params_init(&ctx_params);
 
-    // Model files
-    ctx_params.diffusion_model_path = impl_->loaded_paths.diffusion_model.c_str();
-    ctx_params.vae_path             = impl_->loaded_paths.vae.c_str();
-    ctx_params.clip_l_path          = impl_->loaded_paths.clip_l.c_str();
-    ctx_params.t5xxl_path           = impl_->loaded_paths.t5xxl.c_str();
+    // Diffusion model path: REQUIRED, always set.
+    //
+    // sd.cpp has TWO different parameters for the main model file:
+    //   - model_path:           "all-in-one" checkpoints (SDXL, SD 1.5)
+    //                            where VAE + CLIP encoders are embedded.
+    //                            sd.cpp expects to find SDXL-style or
+    //                            SD1.5-style tensor names in this file.
+    //   - diffusion_model_path: separate-file workflows (FLUX) where the
+    //                            diffusion model is shipped without
+    //                            encoders or VAE. The supporting files
+    //                            are passed via vae_path / clip_l_path /
+    //                            t5xxl_path. sd.cpp expects FLUX-style
+    //                            tensor names in this file.
+    //
+    // Distinguish by whether ANY supporting path is present. If yes
+    // (FLUX), use diffusion_model_path. If no (SDXL/SD1.5), use
+    // model_path so sd.cpp loads the embedded encoders/VAE correctly.
+    const bool has_separate_encoders =
+        !impl_->loaded_paths.vae.empty() ||
+        !impl_->loaded_paths.clip_l.empty() ||
+        !impl_->loaded_paths.t5xxl.empty();
+    if (has_separate_encoders) {
+        ctx_params.diffusion_model_path = impl_->loaded_paths.diffusion_model.c_str();
+    } else {
+        ctx_params.model_path = impl_->loaded_paths.diffusion_model.c_str();
+    }
+
+    // VAE, CLIP-L, T5-XXL: OPTIONAL. For FLUX these are separate files
+    // we always set. For SDXL/SD1.5, these encoders are usually embedded
+    // in the diffusion model .safetensors - if so, the Op leaves the
+    // corresponding loaded_paths field empty and we leave ctx_params
+    // at its _init default (nullptr). sd.cpp then uses the embedded copy.
+    if (!impl_->loaded_paths.vae.empty()) {
+        ctx_params.vae_path = impl_->loaded_paths.vae.c_str();
+    }
+    if (!impl_->loaded_paths.clip_l.empty()) {
+        ctx_params.clip_l_path = impl_->loaded_paths.clip_l.c_str();
+    }
+    if (!impl_->loaded_paths.t5xxl.empty()) {
+        ctx_params.t5xxl_path = impl_->loaded_paths.t5xxl.c_str();
+    }
 
     // ControlNet model is optional. Leave at _init default (nullptr) when
     // the user hasn't configured one - sd.cpp then skips ControlNet

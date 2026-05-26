@@ -109,6 +109,7 @@ public:
         , seed_(-1)
         , strength_(0.75f)
         , cook_revision_(0)
+        , model_type_(0)  // 0=FLUX schnell, 1=SDXL, 2=SD 1.5
         , progress_(0.0f)
         , prompt_("")
         , negative_prompt_("")
@@ -166,6 +167,15 @@ private:
     // and force a re-cook (which is what makes the freshly-baked image
     // appear in the viewer without manual knob nudging).
     int    cook_revision_;
+
+    // Base model architecture. Drives which model files are required
+    // and which can be left empty (sd.cpp uses embedded copies).
+    //   0 = FLUX schnell (requires diffusion + vae + clip_l + t5xxl)
+    //   1 = SDXL          (requires diffusion only; CLIPs + VAE
+    //                       usually embedded in the .safetensors)
+    //   2 = SD 1.5        (requires diffusion only; CLIP + VAE
+    //                       usually embedded in the .ckpt/.safetensors)
+    int    model_type_;
     float  progress_;
     const char* prompt_;
     const char* negative_prompt_;
@@ -274,10 +284,19 @@ void AIGenerate::knobs(Knob_Callback f)
 
     Button(f, "bake", "Bake");
     Tooltip(f, "Run text-to-image generation in the background. The "
-               "result caches to disk and renders to the viewer when done.");
+               "result caches to disk. After completion, click Refresh "
+               "Viewer to display it.");
 
     Button(f, "clear_cache", "Clear Cache");
     Tooltip(f, "Delete all cached generations from the on-disk cache.");
+
+    Button(f, "refresh_viewer", "Refresh Viewer");
+    Tooltip(f, "Force the viewer to recook and display the most recently "
+               "baked image. Use this after a bake completes (status: "
+               "Ready) if the viewer is still showing the old image.\n\n"
+               "Background: Nuke's viewer doesn't automatically refresh "
+               "when an Op's internal state changes from a background "
+               "thread completing. This button forces the recook.");
 
     // Status + progress (read-only display)
     String_knob(f, &status_text_, "status", "Status");
@@ -314,29 +333,67 @@ void AIGenerate::knobs(Knob_Callback f)
     // ---- Models tab ----
     Tab_knob(f, "Models");
 
+    static const char* const model_type_options[] = {
+        "FLUX schnell", "SDXL", "SD 1.5", nullptr
+    };
+    Enumeration_knob(f, &model_type_, model_type_options,
+                     "model_type", "Model Type");
+    Tooltip(f, "Base model architecture. Changes which files are required.\n\n"
+               "FLUX schnell (default):\n"
+               "  - Requires four separate files: diffusion, VAE, CLIP-L, T5-XXL\n"
+               "  - Steps: 4, CFG: 1.0\n"
+               "  - Highest quality, slowest. Apache 2.0 (commercial-safe).\n\n"
+               "SDXL:\n"
+               "  - Requires ONE file: the SDXL .safetensors (everything embedded)\n"
+               "  - Steps: 25, CFG: 7.0 (recommend changing knobs manually)\n"
+               "  - Mature ControlNet ecosystem\n"
+               "  - Clear VAE/CLIP-L/T5-XXL knobs (they're FLUX-only)\n"
+               "  - CreativeML Open RAIL-M (commercial-safe).\n\n"
+               "SD 1.5:\n"
+               "  - Requires ONE file: the SD 1.5 .ckpt or .safetensors\n"
+               "  - Steps: 20-30, CFG: 7.0\n"
+               "  - Fastest, lowest VRAM\n"
+               "  - Clear VAE/CLIP-L/T5-XXL knobs\n"
+               "  - CreativeML Open RAIL-M (commercial-safe).\n\n"
+               "Behind the scenes: if a file path is empty AND no default "
+               "file exists at the path, the plugin won't pass that path to "
+               "sd.cpp - which then uses whatever is embedded in the "
+               "Diffusion Model file.");
+
     File_knob(f, &models_dir_, "models_dir", "Models Directory");
-    Tooltip(f, "Directory containing the four FLUX model files. If empty, "
+    Tooltip(f, "Directory containing model files. If empty, "
                "defaults to the plugin's models/ subdirectory.");
 
     Divider(f, "Individual model paths (override)");
 
     File_knob(f, &diffusion_model_path_, "diffusion_model", "Diffusion Model");
-    Tooltip(f, "FLUX schnell GGUF (default: flux1-schnell-q4_0.gguf from "
-               "huggingface.co/leejet/FLUX.1-schnell-gguf). "
+    Tooltip(f, "Base model file. REQUIRED.\n"
+               "  FLUX: flux1-schnell-q4_0.gguf (or similar)\n"
+               "  SDXL: sd_xl_base_1.0.safetensors\n"
+               "  SD 1.5: any .ckpt or .safetensors\n"
                "If empty, derived from Models Directory.");
 
     File_knob(f, &vae_path_, "vae", "VAE");
-    Tooltip(f, "FLUX VAE (default: ae.safetensors). "
-               "If empty, derived from Models Directory.");
+    Tooltip(f, "VAE file. REQUIRED for FLUX (ae.safetensors).\n"
+               "OPTIONAL for SDXL / SD 1.5 (usually embedded in the "
+               "diffusion model file). If empty for SDXL/SD1.5 AND no "
+               "default file is present, sd.cpp uses the embedded VAE.\n"
+               "If empty for FLUX, derived from Models Directory.");
 
     File_knob(f, &clip_l_path_, "clip_l", "CLIP-L");
-    Tooltip(f, "CLIP-L text encoder (default: clip_l.safetensors). "
-               "If empty, derived from Models Directory.");
+    Tooltip(f, "CLIP-L text encoder. REQUIRED for FLUX (clip_l.safetensors).\n"
+               "NOT USED by SDXL or SD 1.5 (they use CLIP-L + CLIP-G "
+               "embedded in the diffusion model). Clear this knob when "
+               "using SDXL or SD 1.5 to avoid sd.cpp loading the wrong "
+               "file.\n"
+               "If empty for FLUX, derived from Models Directory.");
 
     File_knob(f, &t5xxl_path_, "t5xxl", "T5-XXL");
-    Tooltip(f, "T5-XXL text encoder (default: t5-v1_1-xxl-encoder-Q8_0.gguf "
-               "from huggingface.co/city96/t5-v1_1-xxl-encoder-gguf). "
-               "If empty, derived from Models Directory.");
+    Tooltip(f, "T5-XXL text encoder. REQUIRED for FLUX only "
+               "(t5-v1_1-xxl-encoder-Q8_0.gguf).\n"
+               "NOT USED by SDXL or SD 1.5 (they don't have a T5 encoder).\n"
+               "Clear this knob when using SDXL or SD 1.5.\n"
+               "If empty for FLUX, derived from Models Directory.");
 
     Divider(f, "");
 
@@ -427,11 +484,18 @@ int AIGenerate::knob_changed(Knob* k)
         clear_cache_on_disk();
         return 1;
     }
-    if (std::strcmp(name, "bump_cook_revision") == 0) {
-        // Triggered from menu.py after a bake completes. Mutate the
-        // cook_revision knob through the knob system (NOT direct
+    if (std::strcmp(name, "bump_cook_revision") == 0 ||
+        std::strcmp(name, "refresh_viewer") == 0) {
+        // bump_cook_revision: invisible button, triggered from menu.py's
+        //   polling code after a bake completes. (See known limitation
+        //   note in menu.py - the polling-driven version doesn't reliably
+        //   refresh the viewer, but the button infrastructure is here.)
+        // refresh_viewer: visible button, user clicks it after a bake.
+        //   This is the confirmed-working manual-refresh path.
+        //
+        // Both mutate cook_revision through the knob system (NOT direct
         // member write) so Nuke registers it as a real value change,
-        // updates the hash, and forces a re-cook.
+        // updates the hash via append(Hash&), and forces a re-cook.
         Knob* cr = knob("cook_revision");
         if (cr) {
             const int next = cook_revision_ + 1;
@@ -705,12 +769,34 @@ static EffectivePaths compute_effective_paths(
     const char* t5xxl_knob,
     const char* cache_dir_knob,
     const char* loras_dir_knob,
-    const char* control_net_knob)
+    const char* control_net_knob,
+    int model_type = 0)
 {
     auto empty_ck = [](const char* s) { return !s || !*s; };
     auto pick = [&empty_ck](const char* knob_value,
                             const std::string& fallback) -> std::string {
         return empty_ck(knob_value) ? fallback : std::string(knob_value);
+    };
+
+    // Optional path resolver: if knob set, use it as-is. If empty:
+    //   - For FLUX, try the default filename (file must exist on disk).
+    //   - For SDXL/SD1.5, leave empty (sd.cpp uses embedded encoder).
+    // Either way, only auto-fill if the file actually exists; otherwise
+    // pass empty to sd.cpp (which keeps the _init nullptr default).
+    auto pick_optional = [&empty_ck](const char* knob_value,
+                                     const std::string& default_path,
+                                     bool try_default) -> std::string {
+        if (!empty_ck(knob_value)) {
+            return std::string(knob_value);
+        }
+        if (!try_default || default_path.empty()) {
+            return std::string{};
+        }
+        std::error_code ec;
+        if (fs::exists(fs::u8path(default_path), ec)) {
+            return default_path;
+        }
+        return std::string{};
     };
 
     EffectivePaths ep;
@@ -732,19 +818,34 @@ static EffectivePaths compute_effective_paths(
         ep.cache_dir = nf::default_cache_dir();
     }
 
-    // Individual file paths: knob or <models_dir>/<expected filename>.
-    // Defaults match leejet's canonical FLUX schnell file set:
-    //   - flux1-schnell-q4_0.gguf (NOT Q4_K - see NDK_NOTES section 20)
-    //   - t5-v1_1-xxl-encoder-Q8_0.gguf (city96's Q8 GGUF works in sd.cpp)
-    //   - ae.safetensors / clip_l.safetensors stay as the BFL/OpenAI files
-    ep.diffusion_model = pick(diffusion_knob,
-                              ep.models_dir + "/flux1-schnell-q4_0.gguf");
-    ep.vae             = pick(vae_knob,
-                              ep.models_dir + "/ae.safetensors");
-    ep.clip_l          = pick(clip_l_knob,
-                              ep.models_dir + "/clip_l.safetensors");
-    ep.t5xxl           = pick(t5xxl_knob,
-                              ep.models_dir + "/t5-v1_1-xxl-encoder-Q8_0.gguf");
+    // Diffusion model: REQUIRED for all model types. Default depends on
+    // type; if user clears the knob, we fall back to the default which
+    // start_bake() validates as existing.
+    const bool is_flux = (model_type == 0);
+    if (is_flux) {
+        ep.diffusion_model = pick(diffusion_knob,
+                                  ep.models_dir + "/flux1-schnell-q4_0.gguf");
+    } else {
+        // SDXL/SD1.5 - no canonical default filename, require explicit
+        // knob value. If knob is empty, ep.diffusion_model stays empty
+        // and start_bake reports the missing model.
+        ep.diffusion_model = empty_ck(diffusion_knob) ? std::string{}
+                                                      : std::string(diffusion_knob);
+    }
+
+    // VAE, CLIP-L, T5-XXL: REQUIRED for FLUX, OPTIONAL otherwise.
+    // For FLUX, fall back to canonical defaults. For SDXL/SD1.5, only
+    // use the knob value if set (and even then, only if the file
+    // exists - else leave empty so sd.cpp uses embedded).
+    ep.vae = pick_optional(vae_knob,
+                           ep.models_dir + "/ae.safetensors",
+                           is_flux);
+    ep.clip_l = pick_optional(clip_l_knob,
+                              ep.models_dir + "/clip_l.safetensors",
+                              is_flux);
+    ep.t5xxl = pick_optional(t5xxl_knob,
+                             ep.models_dir + "/t5-v1_1-xxl-encoder-Q8_0.gguf",
+                             is_flux);
 
     // LoRAs directory: knob or <models_dir>/loras.
     ep.loras_dir = pick(loras_dir_knob, ep.models_dir + "/loras");
@@ -860,10 +961,11 @@ std::string AIGenerate::compute_cache_key() const
     const EffectivePaths ep = compute_effective_paths(
         models_dir_, diffusion_model_path_, vae_path_,
         clip_l_path_, t5xxl_path_, cache_dir_, loras_dir_,
-        control_net_path_);
+        control_net_path_, model_type_);
 
     nf::CacheKeyBuilder kb;
     kb.add(std::string("AIGenerate.v1"));
+    kb.add(static_cast<int32_t>(model_type_));
     kb.add(ck_str(prompt_));
     kb.add(ck_str(negative_prompt_));
     kb.add(static_cast<int32_t>(width_));
@@ -929,7 +1031,7 @@ std::string AIGenerate::result_path(const std::string& key) const
     const EffectivePaths ep = compute_effective_paths(
         models_dir_, diffusion_model_path_, vae_path_,
         clip_l_path_, t5xxl_path_, cache_dir_, loras_dir_,
-        control_net_path_);
+        control_net_path_, model_type_);
     if (ep.cache_dir.empty()) return std::string{};
     return ep.cache_dir + "/" + key + ".aigen";
 }
@@ -965,7 +1067,7 @@ void AIGenerate::clear_cache_on_disk()
     const EffectivePaths ep = compute_effective_paths(
         models_dir_, diffusion_model_path_, vae_path_,
         clip_l_path_, t5xxl_path_, cache_dir_, loras_dir_,
-        control_net_path_);
+        control_net_path_, model_type_);
     const std::string dir = ep.cache_dir;
     if (dir.empty()) return;
 
@@ -1081,7 +1183,7 @@ void AIGenerate::start_bake()
     const EffectivePaths ep = compute_effective_paths(
         models_dir_, diffusion_model_path_, vae_path_,
         clip_l_path_, t5xxl_path_, cache_dir_, loras_dir_,
-        control_net_path_);
+        control_net_path_, model_type_);
 
     if (!prompt_ || !*prompt_) {
         error("AIGenerate: empty prompt");
@@ -1107,14 +1209,26 @@ void AIGenerate::start_bake()
     paths.t5xxl           = ep.t5xxl;
     paths.control_net     = ep.control_net;  // empty when ControlNet off
 
-    if (paths.diffusion_model.empty() || paths.vae.empty() ||
-        paths.clip_l.empty() || paths.t5xxl.empty()) {
-        error("AIGenerate: one or more model paths are empty");
-        set_status("Error: model paths missing");
+    // Diffusion model is required for all model types.
+    if (paths.diffusion_model.empty()) {
+        error("AIGenerate: diffusion model path is empty");
+        set_status("Error: diffusion model path missing");
         return;
     }
 
-    // Verify model files exist before kicking off the worker.
+    // For FLUX, all four separate files are required (no embedded copies).
+    // For SDXL/SD1.5, the supporting paths can be empty - sd.cpp will use
+    // whatever is embedded in the diffusion model file.
+    const bool is_flux = (model_type_ == 0);
+    if (is_flux) {
+        if (paths.vae.empty() || paths.clip_l.empty() || paths.t5xxl.empty()) {
+            error("AIGenerate: FLUX requires VAE, CLIP-L, and T5-XXL paths");
+            set_status("Error: FLUX model paths missing");
+            return;
+        }
+    }
+
+    // Verify any non-empty file paths actually exist on disk.
     std::error_code ec;
     auto exists = [&ec](const std::string& p) {
         return fs::exists(fs::u8path(p), ec);
@@ -1125,17 +1239,17 @@ void AIGenerate::start_bake()
         set_status("Error: missing diffusion model file");
         return;
     }
-    if (!exists(paths.vae)) {
+    if (!paths.vae.empty() && !exists(paths.vae)) {
         error("AIGenerate: missing VAE: %s", paths.vae.c_str());
         set_status("Error: missing VAE file");
         return;
     }
-    if (!exists(paths.clip_l)) {
+    if (!paths.clip_l.empty() && !exists(paths.clip_l)) {
         error("AIGenerate: missing CLIP-L: %s", paths.clip_l.c_str());
         set_status("Error: missing CLIP-L file");
         return;
     }
-    if (!exists(paths.t5xxl)) {
+    if (!paths.t5xxl.empty() && !exists(paths.t5xxl)) {
         error("AIGenerate: missing T5-XXL: %s", paths.t5xxl.c_str());
         set_status("Error: missing T5-XXL file");
         return;
