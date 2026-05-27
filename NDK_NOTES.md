@@ -878,6 +878,12 @@ This works imperfectly. The honest assessment: full auto-refresh of
 the Viewer from a custom op after a background bake remains an open
 problem.
 
+**Update (May 2026):** resolved -- see section 24. The fix is one
+line in the Python polling: bump `cook_revision` via `setValue()`
+*before* calling `forceValidate()`. The naive `forceValidate()`
+alone is gated by an internal cache-dirty check that doesn't pick
+up C++-side `append()` changes.
+
 ---
 
 ## 15. Python knob_changed callbacks miss C++ knob mutations
@@ -1472,12 +1478,319 @@ and `proj_out` differ.
 
 ---
 
-*Updated through the nuke-ai-fill FLUX integration (May 2026),
-including the Windows-System32-ONNX battle, DDImage knob-storage
-discovery, viewer-refresh investigation, Carve LaMa-ONNX
-normalization convention, sd.cpp _init-defaults discipline, VAE
-tiling for VRAM headroom, and GGUF file-format-vs-tool
-compatibility, the Windows large-file download (curl.exe over
-Invoke-WebRequest) lesson, and the diffusers-vs-legacy SDXL
-ControlNet tensor naming conversion. Add an entry here when a new gotcha costs a
-debugging round.*
+## 23. DDImage's own private nested types ambush subclasses
+
+Section 2 covered name collisions from `windows.h`. There is a
+parallel class of collisions from DDImage itself: `DD::Image::Op`
+declares private nested types whose names are short common nouns,
+and they shadow any identically-named symbol referenced from inside
+an `Op` subclass.
+
+The one that bit us during nuke-async-refresh-lab bring-up:
+`DD::Image::Op` has a private `enum State` (the cook-state machine:
+Cooking / Ready / Error / etc.). A plugin author writing a worker
+thread naturally reaches for `State` as the type for their own
+state machine. Build error:
+
+```
+error C2248: 'DD::Image::Op::State': cannot access private enum
+  declared in class 'DD::Image::Op'
+error C2838: 'Idle': illegal qualified name in member declaration
+error C2065: 'Idle': undeclared identifier
+```
+
+The diagnostic is misleading. The plugin's `State` is a perfectly
+valid type at namespace scope. What's happening is that from inside
+the subclass body, unqualified `State` resolves to the inherited
+`Op::State` (private, hence C2248), and then the compiler tries to
+find `Idle` inside `Op::State`, which doesn't have it (C2065 /
+C2838). Reading the errors top-down looks like a private-access
+violation; the actual cause is name shadowing.
+
+### 23.1 The fix
+
+Rename. Don't try to fully qualify with the anonymous namespace --
+that path is awkward and a future refactor will trip again. Prefix
+the type with something domain-specific:
+
+```cpp
+// Bad - collides with Op::State
+enum class State : int { Idle, Running, Ready };
+std::atomic<State> state_;
+
+// Good - no collision possible
+enum class BakeState : int { Idle, Running, Ready };
+std::atomic<BakeState> state_;
+```
+
+### 23.2 Other names to avoid
+
+Anything short and generic. Confirmed or likely-colliding nested
+names in `Op` / `Iop` / `GeoOp` / `DrawIop` and their bases include
+`State`, `Info`, `Hash`, `Channel`, `Format`, `Knob` (these last
+four are full `DD::Image::*` types, not nested, but the same
+identifier-resolution trap applies inside the class body). Prefix
+plugin-internal types with something specific: `WorkerInfo`,
+`CacheHash`, `BakeChannel`, `OutputFormat`.
+
+### 23.3 Why `#undef` doesn't apply here
+
+Section 2's `POINTS` fix works because `POINTS` is a preprocessor
+macro -- `#undef` removes it before the DDImage header is
+included. `Op::State` is a real C++ nested type declaration; there
+is no preprocessor stage that can hide it from the subclass body.
+Rename the colliding identifier in plugin code, or fully qualify
+every use with the namespace.
+
+### 23.4 General principle
+
+Inside an `Op` subclass body, every short single-word identifier is
+playing two games at once: yours, and whatever DDImage put in the
+base class. The compiler chooses the inherited name. Plugin code
+that builds at namespace scope and then fails inside a subclass
+method body is almost always this. The fix is always renaming;
+working around it with qualification leaves the trap in place for
+the next person.
+
+---
+
+## 24. Python forceValidate() is gated by Nuke's cache-dirty check
+
+Section 14 documented a then-open problem: an async-Op worker
+completes a bake, the C++ side bumps a hash-contributing variable,
+but a polling timer calling `n.forceValidate()` from Python fails
+to refresh the Viewer. The `nuke-async-refresh-lab` minimal repro
+isolated and solved this.
+
+### 24.1 What the lab observed
+
+A minimal Iop with a Bake button, a 3s sleeping worker, an atomic
+`generation_` bumped on completion (and included in `append()`),
+and a Python polling timer that called `n.forceValidate()` every
+0.3s while the status knob held an active marker. A diagnostic
+counter exposed as a knob showed `_validate()` was called exactly
+twice over a 9-second run: once at initial cook, once at the
+`invalidate()` inside the Bake handler. The ~25 subsequent
+polling-driven `forceValidate()` calls produced *zero* `_validate()`
+invocations.
+
+Adding a single line -- `cook_revision.setValue(value + 1)` before
+the `forceValidate()` -- changed the count to one `_validate()` per
+tick, the status flipped to "Ready" on its own when the worker
+completed, and the Viewer auto-refreshed to the baked frame
+without manual intervention.
+
+### 24.2 What this means
+
+`nuke.Node.forceValidate()` from Python is *not* an unconditional
+revalidation. It is gated by an internal cache-dirty check that
+appears to key off real-knob changes and some Nuke-internal state,
+*not* off whatever the C++ override of `append()` puts into the
+hash. Bumping an atomic that's included in `append()` is not
+enough to dirty the cache from the perspective of this check. The
+mechanism that does dirty it reliably is changing a Knob's value
+via `Knob::set_value()` / `knob.setValue()`. Even setting it back
+to the same value has been observed to be unreliable; the simplest
+robust pattern is monotonically incrementing a hidden int knob.
+
+### 24.3 Why production "mostly worked" without this
+
+The production polling in nuke-ai-fill called only
+`n.forceValidate()` on active ticks and was observed to update the
+status display live ("Inferencing 12/25", "step 13/25", and so
+on). The reason this worked there but not in a naive testbed is
+that production's status text varies between ticks via
+`Knob::set_text` calls from inside `_validate`. Each unique status
+string change appears to dirty Nuke's cache enough for the next
+`forceValidate()` to actually do something. A testbed with a
+constant `"Generating"` string and a constant `cook_revision` does
+not get this for free.
+
+The bug only manifested at the *final* transition (Inferencing ->
+Ready) because at that point the polling had decided to back off
+(status no longer active) and would not issue another
+`forceValidate()` to catch up. The cr++/force pattern below makes
+the transition take care of itself.
+
+### 24.4 The canonical polling pattern
+
+```python
+_ACTIVE = ("Generating", "Cooking", "Loading",
+           "Inferencing", "Writing")
+
+def _poll():
+    try:
+        for n in nuke.allNodes():
+            if n.Class() not in ("AIGenerate", "AISmartFill"):
+                continue
+            sk = n.knob("status")
+            if sk is None:
+                continue
+            if any(m in sk.value() for m in _ACTIVE):
+                # The cr.setValue() is mandatory. Without it,
+                # forceValidate() is a no-op when the C++ side
+                # hasn't dirtied a real knob since the last
+                # validate. See NDK_NOTES section 24.
+                cr = n.knob("cook_revision")
+                if cr is not None:
+                    cr.setValue(cr.value() + 1)
+                n.forceValidate()
+    except Exception:
+        traceback.print_exc()
+    # Always reschedule.
+    threading.Timer(0.3,
+        lambda: nuke.executeInMainThread(_poll)).start()
+```
+
+No active->inactive transition handler is needed. The last
+cr++/force during the active phase is what triggers `_validate()`
+to read `state_=Ready`, set the status text, and -- because
+`cook_revision` is included in the C++ `append()` -- cause the
+Viewer to re-cook the final pixels.
+
+The manual Refresh Viewer button on the Op panel can stay as a
+safety net but should never actually be needed once polling does
+cr++/force.
+
+### 24.5 General principle
+
+For any pattern that depends on a Python polling timer driving
+C++-side state observation through `forceValidate()`: assume the
+call is conditional on a real-knob change since the last validate.
+If your C++ side doesn't naturally vary a knob during work, bump a
+hidden `cook_revision`-style integer knob from Python before each
+`forceValidate()`. Treat `append()` overrides as input to Nuke's
+cook-hash computation, not as a way to dirty the validate cache
+from the C++ side.
+
+---
+
+## 25. The cook_revision pattern applies to every async disk-cached Op
+
+The fix documented in section 24 is not AIGenerate-specific. Any
+Op with the pattern "background worker writes a disk cache, then
+loads pixels into an in-memory buffer read by engine()" needs the
+same plumbing -- or it suffers the same viewer-doesn't-refresh
+symptom that disable/re-enable toggles work around.
+
+AISmartFill (the LaMa inpainting sibling to AIGenerate) was
+missing `cook_revision` until May 2026 because the original
+implementation predated section 24's discovery. The lesson: when
+adding a new Op of this shape, do not assume "I'll do auto-refresh
+later." Add the knob from day one. The C++ side overhead is six
+lines of boilerplate; the cost of not having it is hours of user
+confusion plus the eventual realization that the entire menu.py
+polling pipeline runs but accomplishes nothing.
+
+### 25.1 The diagnostic that catches a missing cook_revision
+
+Run `menu.dump_managed_status()` (in nuke-ai-fill's menu.py) on a
+node that should be refreshing but isn't:
+
+```
+=== managed node status ===
+AISmartFill1 (AISmartFill)
+    status        : 'Already cached for this input'
+    cook_revision : (no cook_revision knob)
+    polling sees  : ACTIVE
+=== end ===
+```
+
+`cook_revision : (no cook_revision knob)` plus `polling sees:
+ACTIVE` is the unambiguous signature. The polling timer correctly
+detects the node as active (its status string is non-idle), looks
+up `cook_revision`, finds it missing, falls through to a bare
+`forceValidate()`, and accomplishes nothing per section 24.2.
+
+The user-visible workaround is to manually toggle the `disable`
+knob, which works because that toggle IS a real value change Nuke
+notices -- exactly the mechanism cook_revision exploits without
+the side effect of actually disabling computation.
+
+### 25.2 The five sites that need patching in every async Op
+
+Mirroring AIGenerate's known-working pattern exactly:
+
+1. **Member declaration**:
+   ```cpp
+   int cook_revision_;
+   ```
+
+2. **Constructor initializer**:
+   ```cpp
+   , cook_revision_(0)
+   ```
+
+3. **`knobs()` block** (after the status / progress displays):
+   ```cpp
+   Button(f, "refresh_viewer", "Refresh Viewer");
+
+   Int_knob(f, &cook_revision_, "cook_revision", "");
+   SetFlags(f, Knob::INVISIBLE | Knob::NO_ANIMATION | Knob::DO_NOT_WRITE);
+
+   Button(f, "bump_cook_revision", "");
+   SetFlags(f, Knob::INVISIBLE | Knob::DO_NOT_WRITE);
+   ```
+
+4. **`knob_changed`** (shared handler for both buttons):
+   ```cpp
+   if (k->is("bump_cook_revision") || k->is("refresh_viewer")) {
+       Knob* cr = knob("cook_revision");
+       if (cr) {
+           const int next = cook_revision_ + 1;
+           cr->set_value(static_cast<double>(next));
+       }
+       return 1;
+   }
+   ```
+   The bump goes through `Knob::set_value()`, NOT direct member
+   write. Per section 24.2, only the knob-system path dirties
+   Nuke's validate cache.
+
+5. **`append(Hash&)`**:
+   ```cpp
+   hash.append(cook_revision_);
+   ```
+   Alongside any other cache-state hashes (e.g. `loaded_key_`).
+
+### 25.3 Why DO_NOT_WRITE matters
+
+`cook_revision` must NOT serialize to the .nk file. Each session
+starts at 0, the polling timer bumps it as needed during the
+session, and the count is discarded on exit. Without
+`Knob::DO_NOT_WRITE`, opening a script with a non-zero
+`cook_revision` value baked in would trigger a phantom recook on
+load. Same reason `NO_ANIMATION`: this knob participates in
+caching at a global level, never per-frame; a per-frame variation
+would invalidate the cache on every frame change.
+
+### 25.4 General principle
+
+Any Op whose user-visible output is gated by async-completed
+in-memory state needs:
+
+- A real Knob that bumps on completion (typically via the
+  polling timer, optionally also via a manual Refresh button).
+- That Knob included in the Op's `append(Hash&)` override.
+- The bump performed through `Knob::set_value()`, not by writing
+  the backing member directly.
+
+Without all three, the polling pipeline runs invisibly and users
+discover the disable/re-enable workaround independently. With all
+three, the auto-refresh is invisible the way it should be.
+
+---
+
+*Updated through nuke-ai-fill v1.0.1 (May 2026), including the
+Windows-System32-ONNX battle, DDImage knob-storage discovery,
+viewer-refresh investigation, Carve LaMa-ONNX normalization
+convention, sd.cpp _init-defaults discipline, VAE tiling for VRAM
+headroom, GGUF file-format-vs-tool compatibility, the Windows
+large-file download (curl.exe over Invoke-WebRequest) lesson, the
+diffusers-vs-legacy SDXL ControlNet tensor naming conversion, the
+DDImage subclass-scope name collision trap (Op::State et al.),
+the Python forceValidate() cache-dirty gating that closes out
+section 14's open viewer-refresh problem, and the AISmartFill
+catch-up that generalizes the cook_revision pattern to every
+async disk-cached Op. Add an entry here when a new gotcha costs
+a debugging round.*
