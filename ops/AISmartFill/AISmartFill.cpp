@@ -125,6 +125,7 @@ public:
         , model_path_("")
         , cache_dir_("")
         , status_text_("(idle) press Bake to inpaint")
+        , cook_revision_(0)
     {
     }
 
@@ -156,9 +157,17 @@ public:
     // cache state has. Including loaded_key_ here makes the hash flip
     // when the worker completes and try_load_cache_for_key populates
     // the buffer, which makes Nuke notice and re-cook engine().
+    //
+    // cook_revision_ is also included: bumped from menu.py's polling
+    // timer (and the manual Refresh Viewer button) when the status
+    // shows active work; this is what dirties Nuke's validate cache so
+    // forceValidate() actually re-cooks engine() and the freshly
+    // cached pixels appear in the viewer without disable/re-enable.
+    // See NDK_NOTES section 24 for the diagnostic.
     void append(Hash& hash) override {
         Iop::append(hash);
         hash.append(loaded_key_);
+        hash.append(cook_revision_);
     }
 
     void _validate(bool for_real) override;
@@ -189,6 +198,8 @@ private:
     const char* model_path_;
     const char* cache_dir_;
     const char* status_text_;     // read-only display
+    int         cook_revision_;   // hidden, bumped by polling/refresh
+                                  // to dirty Nuke's validate cache
 
     // ---- Runtime state ----
     Iop* mask_iop_ = nullptr;
@@ -285,6 +296,31 @@ void AISmartFill::knobs(Knob_Callback f)
 
     Float_knob(f, &progress_, IRange(0.0f, 1.0f), "progress", "Progress");
     SetFlags(f, Knob::DISABLED | Knob::NO_ANIMATION);
+
+    Button(f, "refresh_viewer", "Refresh Viewer");
+    Tooltip(f, "Force the viewer to recook and display the most "
+               "recently baked result. Should not be needed in normal "
+               "use - menu.py's polling timer bumps cook_revision "
+               "automatically while status is non-idle. Manual fallback "
+               "if the polling isn't running.");
+
+    // Hidden plumbing for viewer auto-refresh. See NDK_NOTES section 24.
+    //
+    // cook_revision is an int that participates in append(Hash&). When
+    // it changes, Nuke considers our output stale and recooks engine().
+    // menu.py polls active nodes ~3x/sec and bumps cook_revision via
+    // the invisible bump_cook_revision button below; once the worker
+    // flips state to Ready (or "Already cached..."), the next bump +
+    // forceValidate pair makes the cached pixels appear in the viewer.
+    //
+    // NO_ANIMATION + DO_NOT_WRITE: cook_revision affects caching at
+    // a global level, never per-frame, and must not serialize to the
+    // .nk file (each session starts fresh at 0).
+    Int_knob(f, &cook_revision_, "cook_revision", "");
+    SetFlags(f, Knob::INVISIBLE | Knob::NO_ANIMATION | Knob::DO_NOT_WRITE);
+
+    Button(f, "bump_cook_revision", "");
+    SetFlags(f, Knob::INVISIBLE | Knob::DO_NOT_WRITE);
 }
 
 int AISmartFill::knob_changed(Knob* k)
@@ -297,6 +333,21 @@ int AISmartFill::knob_changed(Knob* k)
         }
         if (k->is("clear_cache")) {
             clear_cache_dir();
+            return 1;
+        }
+        if (k->is("bump_cook_revision") || k->is("refresh_viewer")) {
+            // Both buttons share one handler. bump_cook_revision is
+            // invisible, triggered by menu.py's polling timer.
+            // refresh_viewer is the visible manual button.
+            // Mutate cook_revision through the knob system (NOT direct
+            // member write) so Nuke registers it as a real value
+            // change, updates the hash via append(Hash&), and forces
+            // a re-cook of engine(). See NDK_NOTES section 24.
+            Knob* cr = knob("cook_revision");
+            if (cr) {
+                const int next = cook_revision_ + 1;
+                cr->set_value(static_cast<double>(next));
+            }
             return 1;
         }
     }
